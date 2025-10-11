@@ -1,0 +1,116 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-left i, .header-right i {
+    color: #333;
+    font-size: 18px;
+}
+
+
+.container {
+    padding: 20px 15px;
+}
+
+.redeem-option {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.redeem-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border: 2px dashed #ccc; /* Dashed border for the circle */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+    position: relative;
+    overflow: hidden; /* To keep shapes within the circle */
+}
+
+/* UPI Icon specific styling to mimic the image */
+.upi-icon-wrapper {
+    border-color: #87CEEB; /* A light blueish gray for the dashed border */
+    position: relative;
+}
+
+.upi-shape-orange {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: #FFA500; /* Orange */
+    border-radius: 5px;
+    transform: rotate(45deg) translate(-5px, -5px); /* Position and rotate */
+    left: 10px;
+    top: 10px;
+}
+
+.upi-shape-green {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: #28a745; /* Green */
+    border-radius: 5px;
+    transform: rotate(45deg) translate(5px, 5px); /* Position and rotate */
+    right: 10px;
+    bottom: 10px;
+}
+
+.upi-shape-triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 18px solid #007bff; /* Blue */
+    transform: rotate(15deg);
+    top: 18px;
+    left: 16px;
+    z-index: 1; /* Ensure it's above other shapes */
+}
+
+
+.option-text {
+    flex-grow: 1; /* Takes up available space */
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.arrow-icon {
+    color: #bbb;
+    font-size: 18px;
+}

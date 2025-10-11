@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin To Real Cash - Login</title>
+    <link rel="stylesheet" href="assets/css/Login page.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header-banner">
+        <h1>Coin To Real Cash</h1>
+    </div>
+    <div class="container">
+        <h2>Welcome</h2>
+        <p class="subtitle">Sign in to continue</p>
+
+        <form>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" placeholder="Email">
+            </div>
+            <div class="input-group password-field"> <!-- Added password-field class -->
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Password" id="login-password">
+                <i onclick="togglePasswordVisibility('login-password')"></i>
+            </div>
+            <div class="forgot-password-link">
+                <a href="#">Forget Password?</a>
+            </div>
+            <button type="submit" class="login-btn"><a href="home page.html">Login</a></button>
+        </form>
+        </form>
+
+        <div class="separator">
+            <span>Continue with</span>
+        </div>
+
+        <button type="button" class="google-signin-btn">
+            <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google logo" class="google-icon">
+            Sign in with Google
+        </button>
+
+        <p class="new-user-link">I'm a new user? <a href="index.html">Create Account</a></p>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling; // Assuming icon is the next sibling
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+</body>
+</html>

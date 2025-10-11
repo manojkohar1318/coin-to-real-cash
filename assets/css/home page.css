@@ -1,0 +1,205 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background-color: #f0f2f5; /* Light grey background */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 70px; /* Space for fixed bottom nav */
+    box-sizing: border-box;
+}
+
+.header {
+    background-color: #fff; /* White background for header text */
+    padding: 20px 20px 10px;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+.header p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.container {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.balance-card {
+    background: linear-gradient(to right, #1e90ff, #00c6d9); /* Blue to Teal gradient */
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.balance-top-row {
+    display: flex;
+    justify-content: space-between; /* To push elements apart if more are added */
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.balance-label {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.balance-amounts-row {
+    display: flex;
+    justify-content: space-between; /* To push coins left and rupees right */
+    align-items: baseline; /* Align text baselines */
+}
+
+.balance-coins {
+    margin: 0;
+    font-size: 2.2em; /* Adjusted slightly for dual display */
+    font-weight: bold;
+}
+
+.balance-rupees {
+    margin: 0;
+    font-size: 1.5em; /* Smaller than coins, but still prominent */
+    font-weight: bold;
+    opacity: 0.9;
+}
+
+
+.stats-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.stat-label {
+    margin: 0;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.stat-value {
+    margin: 10px 0 0;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+}
+
+.activities-section {
+    margin-bottom: 20px;
+}
+
+.activities-title {
+    font-size: 1.5em;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.activities-subtitle {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.activities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 15px; /* Space between boxes */
+}
+
+.activity-box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 25px 15px; /* Larger padding for bigger boxes */
+    text-align: center;
+    color: white; /* Text color for activities */
+    font-weight: bold;
+    font-size: 1.1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.activity-box:hover {
+    transform: translateY(-3px);
+}
+
+.activity-box i {
+    font-size: 2.5em; /* Larger icon size */
+    margin-bottom: 5px;
+}
+
+/* Specific background colors for activity boxes */
+.daily-bonus { background-color: #00bcd4; } /* Cyan */
+.spin-wheel { background-color: #ff6384; } /* Pink/Red */
+.scratch-cards { background-color: #ffcd56; } /* Yellow */
+.watch-ads { background-color: #4bc0c0; } /* Teal-Green */
+
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #888;
+    font-size: 0.8em;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+.nav-item i {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+.nav-item.active {
+    color: #1e90ff; /* Active item color */
+}
+
+.nav-item:hover {
+    color: #1e90ff; /* Hover color */
+}

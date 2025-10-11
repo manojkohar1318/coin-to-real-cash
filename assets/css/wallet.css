@@ -1,0 +1,179 @@
+/* Basic Resets and Body Styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5; /* Light gray background */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to the top */
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    background-color: #ffffffe0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+}
+
+
+.top-bar .page-title {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    margin: 0;
+}
+
+/* Main Wallet Content */
+.wallet-main {
+    flex-grow: 1;
+    padding: 20px 15px;
+    padding-bottom: 80px; /* Space for fixed bottom navigation */
+}
+
+.page-intro {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.page-intro h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1770ff;
+    margin: 0 0 5px 0;
+}
+
+.page-intro p {
+    font-size: 14px;
+    color: #022b6bd4;
+    margin: 0;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.current-balance-card h3 {
+    font-size: 16px;
+    color: #1770ff;
+    margin: 0 0 10px 0;
+}
+
+.balance-amount {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1770ff;
+    margin: 0 0 20px 0;
+}
+
+.redeem-now-btn {
+    background-color: #007bff; /* Primary blue button */
+    color: #fff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Make button full width of card */
+    max-width: 250px; /* Limit max width */
+}
+
+.redeem-now-btn:hover {
+    background-color: #0056b3;
+}
+
+.transaction-history-card h3 {
+    font-size: 16px;
+    color: #555;
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+.no-transactions {
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* You can style .transaction-item if you add them later */
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #333;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-description {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.transaction-amount {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.transaction-date {
+    color: #777;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+
+/* Bottom Navigation (reused and adapted) */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px 0;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #888;
+    font-size: 12px;
+    padding: 5px;
+    flex: 1; /* Distribute items evenly */
+}
+
+.bottom-nav .nav-item i {
+    font-size: 22px;
+    margin-bottom: 3px;
+}
+
+.bottom-nav .nav-item.active {
+    color: #007bff; /* Primary color for active item */
+}
+
+.bottom-nav .nav-item.active i {
+    color: #007bff;
+}
