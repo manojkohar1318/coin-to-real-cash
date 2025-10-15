@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin Wheel</title>
+  <link rel="stylesheet" href="assets/css/spin.css" />
+</head>
+<body>
+
+<a href="home page.html" class="back-btn">
+  &#8592; Back
+</a>
+  <div class="container">
+    <!-- Fixed Pointer -->
+    <div class="pointer"></div>
+
+    <!-- Wheel -->
+    <div class="wheel" id="wheel">
+      <!-- Segments will be added dynamically from JS -->
+    </div>
+  </div>
+
+  <!-- Play Button -->
+  <a href="#" class="spinBtn-2 btn">Play</a>
+
+  <!-- Popup Message -->
+  <div class="overlay"></div>
+  <div class="message" id="winMessage"></div>
+
+  <script>
+    const wheel = document.getElementById('wheel');
+    const spinBtn2 = document.querySelector('.spinBtn-2');
+    const message = document.getElementById('winMessage');
+    const overlay = document.querySelector('.overlay');
+
+    // 🟩 1️⃣ Define the prize values here — edit this to change all segment values
+    const values = [2, 1, 50, 0, 100, 10, 5, 20];
+
+    // 🟩 2️⃣ Optional — define colors for each segment (same length as values)
+    const colors = ['#db7093', '#20b2aa', '#d63e92', '#daa520', '#ff34f0', '#ff7f50', '#3cb371', '#4169e1'];
+
+    // 🟩 3️⃣ Generate the wheel segments dynamically
+    wheel.innerHTML = values.map((val, i) => `
+      <div class="number" style="--i:${i + 1}; --clr:${colors[i]}">
+        <span>${val}</span>
+      </div>
+    `).join('');
+
+    // 🟩 4️⃣ Spin logic
+    let deg = 0;
+
+    spinBtn2.addEventListener('click', (e) => {
+      e.preventDefault();
+      spinBtn2.style.pointerEvents = 'none'; // disable during spin
+
+      const extraSpin = 3600; // multiple rotations
+      const randomDegree = Math.floor(Math.random() * 360);
+      deg += extraSpin + randomDegree;
+
+      wheel.style.transform = `rotate(${deg}deg)`;
+
+      // Wait for spin animation to complete (5s as per CSS)
+      setTimeout(() => {
+        const actualDeg = deg % 360;
+        const segmentAngle = 360 / values.length;
+
+        // 🧭 For downward pointer, adjust offset
+        const offset = segmentAngle / 2;
+        const index = Math.floor((actualDeg + offset) / segmentAngle) % values.length;
+
+        const prize = values[(values.length - 0 - index + values.length) % values.length];
+
+        // 🏆 Show winning message
+        overlay.style.display = 'block';
+        message.style.display = 'block';
+        message.innerHTML = `🎉 You won <span style="color:#1e90ff">${prize}</span> coins!`;
+
+        // Hide popup after 3s
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          message.style.display = 'none';
+          spinBtn2.style.pointerEvents = 'auto';
+        }, 3000);
+      }, 5000);
+    });
+  </script>
+
+</body>
+</html>
