@@ -29,7 +29,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     width: 90%;
-    margin-top: 20px;
+    margin-top: 50px;
     text-align: center;
 }
 
@@ -82,47 +82,9 @@ h2 {
     color: #888;
 }
 
-/* OTP Group Styling */
-.otp-group {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 10px; /* Space between button and input */
+.form-group-checkbox {
+    margin-right: 65%;
 }
-
-.get-otp-btn {
-    padding: 10px 15px;
-    background-color: #1e90ff; /* Vibrant blue */
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9em;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap; /* Prevent text from wrapping */
-    transition: background-color 0.3s ease;
-}
-
-.get-otp-btn:hover {
-    background-color: #1a7cdc;
-}
-
-.otp-input {
-    flex-grow: 1;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px 15px;
-    font-size: 1em;
-    outline: none;
-    background-color: #f9f9f9;
-}
-
-.otp-input::placeholder {
-    color: #aaa;
-}
-
-
 .create-account-btn {
     width: 100%;
     padding: 15px;

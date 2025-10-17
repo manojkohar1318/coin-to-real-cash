@@ -9,25 +9,15 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="header">
-          
-            <div class="top-bar">
-                <a href="home page.html">
-                <i class="fas fa-arrow-left"></i>
-                </a>
-                <h1 class="page-title">Home</h1> <!-- Placeholder for user ID -->
-                <i class="fas fa-ellipsis-v" style="display:none"></i>
-            </div>
-        </header>
-
+        
         <main class="profile-main">
             <div class="user-info">
                 <div class="profile-avatar">
                     <img src="assets/image/user.png" alt="Profile Picture">
                 </div>
                 <div class="user-details">
-                    <span class="username">Manoj@1318</span>
-                    <span class="email">manojkohart1326@gmail.com</span>
+                    <span class="username" id="profileUsername">Manoj@1318</span>
+                    <span class="email" id="profileEmail">manojkohart1326@gmail.com</span>
                 </div>
             </div>
 
@@ -36,20 +26,11 @@
                 <div class="my-coin-box">
                     <span>My Coin</span>
                     <i class="fas fa-coins"></i>
-                    <span class="coin-count">0</span>
+                    <span class="coin-count" id="profileCoinCount">0</span> 
                 </div>
             </div>
-
+            
             <div class="menu-list">
-                <a href="redeem-page.html" class="menu-item">
-                    <div class="icon-bg green-bg"><i class="fas fa-gift"></i></div>
-                    <div class="item-text">
-                        <h3>Redeem</h3>
-                        <p>Collect Reward & Gift Card</p>
-                    </div>
-                  
-                    <i class="fas fa-chevron-right"></i>
-                </a>
                 <a>
                     
                 </a>
@@ -115,5 +96,35 @@
             </a>
         </nav>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all display elements
+            const coinCountDisplay = document.getElementById('profileCoinCount');
+            const usernameDisplay = document.getElementById('profileUsername'); // New
+            const emailDisplay = document.getElementById('profileEmail');       // New
+            
+            // --- Coin Balance Logic ---
+            function loadProfileBalance() {
+                const mainBalance = parseInt(localStorage.getItem('mainBalance') || 0);
+                coinCountDisplay.textContent = mainBalance;
+            }
+            
+            // --- User Details Logic ---
+            function loadUserDetails() {
+                // Retrieve username and email from Local Storage
+                const savedUsername = localStorage.getItem('username');
+                const savedEmail = localStorage.getItem('email');
+
+                // Update the display elements, using default text if values aren't found
+                usernameDisplay.textContent = savedUsername || 'Guest User';
+                emailDisplay.textContent = savedEmail || 'No Email Provided';
+            }
+
+            // Run both functions when the page loads
+            loadProfileBalance();
+            loadUserDetails();
+        });
+    </script>
 </body>
 </html>

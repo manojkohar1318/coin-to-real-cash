@@ -25,66 +25,95 @@
   <a href="#" class="spinBtn-2 btn">Play</a>
 
   <!-- Popup Message -->
-  <div class="overlay"></div>
-  <div class="message" id="winMessage"></div>
+ <div class="overlay"></div>
+  <div class="message" id="winMessage">
+    </div>
 
+<div id="balanceDisplay" style="position: fixed; top: 10px; right: 10px; padding: 10px; background: #fff; border: 1px solid #ccc; border-radius: 5px;">
+    Balance: <span id="currentBalance">0</span>
+</div>
   <script>
-    const wheel = document.getElementById('wheel');
-    const spinBtn2 = document.querySelector('.spinBtn-2');
-    const message = document.getElementById('winMessage');
-    const overlay = document.querySelector('.overlay');
+  const wheel = document.getElementById('wheel');
+  const spinBtn2 = document.querySelector('.spinBtn-2');
+  const message = document.getElementById('winMessage');
+  const overlay = document.querySelector('.overlay');
+  const balanceDisplay = document.getElementById('currentBalance');
 
-    // 🟩 1️⃣ Define the prize values here — edit this to change all segment values
-    const values = [2, 1, 50, 0, 100, 10, 5, 20];
+  // --- Balance Management Functions ---
+  function getBalance() {
+      return parseInt(localStorage.getItem('mainBalance') || 0);
+  }
 
-    // 🟩 2️⃣ Optional — define colors for each segment (same length as values)
-    const colors = ['#db7093', '#20b2aa', '#d63e92', '#daa520', '#ff34f0', '#ff7f50', '#3cb371', '#4169e1'];
+  function updateBalance(newBalance) {
+      localStorage.setItem('mainBalance', newBalance);
+      balanceDisplay.textContent = newBalance;
+  }
 
-    // 🟩 3️⃣ Generate the wheel segments dynamically
-    wheel.innerHTML = values.map((val, i) => `
+  // Initialize balance display on load
+  updateBalance(getBalance());
+
+  // --- Wheel Logic ---
+  const values = [2, 1, 50, 0, 100, 10, 5, 20];
+  const colors = ['#db7093', '#20b2aa', '#d63e92', '#daa520', '#ff34f0', '#ff7f50', '#3cb371', '#4169e1'];
+
+  wheel.innerHTML = values.map((val, i) => `
       <div class="number" style="--i:${i + 1}; --clr:${colors[i]}">
-        <span>${val}</span>
+          <span>${val}</span>
       </div>
-    `).join('');
+  `).join('');
 
-    // 🟩 4️⃣ Spin logic
-    let deg = 0;
+  let deg = 0;
+  let currentPrize = 0;
 
-    spinBtn2.addEventListener('click', (e) => {
+  spinBtn2.addEventListener('click', (e) => {
       e.preventDefault();
-      spinBtn2.style.pointerEvents = 'none'; // disable during spin
+      spinBtn2.style.pointerEvents = 'none';
+      message.innerHTML = '';
+      overlay.style.display = 'none';
+      message.style.display = 'none';
 
-      const extraSpin = 3600; // multiple rotations
+      const extraSpin = 3600;
       const randomDegree = Math.floor(Math.random() * 360);
       deg += extraSpin + randomDegree;
 
       wheel.style.transform = `rotate(${deg}deg)`;
 
-      // Wait for spin animation to complete (5s as per CSS)
       setTimeout(() => {
-        const actualDeg = deg % 360;
-        const segmentAngle = 360 / values.length;
+          const actualDeg = deg % 360;
+          const segmentAngle = 360 / values.length;
+          const offset = segmentAngle / 2;
+          const index = Math.floor((actualDeg + offset) / segmentAngle) % values.length;
+          currentPrize = values[(values.length - index + values.length) % values.length];
 
-        // 🧭 For downward pointer, adjust offset
-        const offset = segmentAngle / 2;
-        const index = Math.floor((actualDeg + offset) / segmentAngle) % values.length;
+          // 🏆 Show winning message (only Add button now)
+          overlay.style.display = 'block';
+          message.style.display = 'block';
+          message.innerHTML = `
+              <h2>🎉 Congratulations!</h2>
+              <p>You won <span style="color:#1e90ff; font-weight:bold; font-size:1.5em;">${currentPrize}</span> coins!</p>
+              <div class="action-buttons">
+                  <button id="addBalanceBtn">Add to Main Balance</button>
+              </div>
+          `;
 
-        const prize = values[(values.length - 0 - index + values.length) % values.length];
+          // 🟢 Add balance + close popup automatically
+          document.getElementById('addBalanceBtn').addEventListener('click', () => {
+              const currentBalance = getBalance();
+              const newBalance = currentBalance + currentPrize;
+              updateBalance(newBalance);
 
-        // 🏆 Show winning message
-        overlay.style.display = 'block';
-        message.style.display = 'block';
-        message.innerHTML = `🎉 You won <span style="color:#1e90ff">${prize}</span> coins!`;
+              // Close popup after short delay
+              setTimeout(() => {
+                  overlay.style.display = 'none';
+                  message.style.display = 'none';
+                  spinBtn2.style.pointerEvents = 'auto';
+              }, 1000);
 
-        // Hide popup after 3s
-        setTimeout(() => {
-          overlay.style.display = 'none';
-          message.style.display = 'none';
-          spinBtn2.style.pointerEvents = 'auto';
-        }, 3000);
+              currentPrize = 0;
+          });
+
       }, 5000);
-    });
-  </script>
-
+  });
+</script>
 </body>
 </html>

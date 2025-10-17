@@ -8,56 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <header class="header">
-           
-        </header>
-
-        <main class="wallet-main">
-            <div class="page-intro">
-                <h2>Wallet</h2>
-                <p>Manage your earnings</p>
-            </div>
-
-            <div class="card current-balance-card">
-                <h3>Current Balance</h3>
-                <p class="balance-amount">0 Coins</p>
-                <a href="redeem-page.html">
-                <button class="btn redeem-now-btn">Redeem Now</button>
-                </a>
-            </div>
-
-            <div class="card transaction-history-card">
-                <h3>Transaction History</h3>
-                <p class="no-transactions">No transactions yet</p>
-                <!--
-                    You can add transaction items here when available, e.g.:
-                    <div class="transaction-item">
-                        <span class="transaction-description">Earned from survey</span>
-                        <span class="transaction-amount">+100 Coins</span>
-                        <span class="transaction-date">2023-10-26</span>
-                    </div>
-                -->
-            </div>
-        </main>
-
-   <div class="bottom-nav">
-        <a href="home page.html" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="invite.html" class="nav-item">
-            <i class="fas fa-user-plus"></i>
-            <span>Invite</span>
-        </a>
-        <a href="wallet.html" class="nav-item active">
-            <i class="fas fa-wallet"></i> <!-- Wallet Icon -->
-            <span>Wallet</span>
-        </a>
-        <a href="profile-page.html" class="nav-item">
-            <i class="fas fa-user-circle"></i>
-            <span>Profile</span>
-        </a>
+    <body>
+  <div class="container">
+    <header>
+      <h1>CoinToRealCash</h1>
+    </header>
+    <!-- Balance Display -->
+    <div class="balance-box">
+      <div class="balance-item">
+        <h3>Coins</h3>
+        <p id="wallet-balance">0</p>
+      </div>
+      <div class="divider"></div>
+      <div class="balance-item">
+        <h3>Rupees</h3>
+        <p id="winning-balance">₹0</p>
+      </div>
     </div>
+
+    <!-- Withdraw Method -->
+    <div class="method-select">
+      <div class="method active" id="upi">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" />
+      </div>
+      <div class="method" id="bank">
+        <i class="fas fa-university"></i>
+      </div>
+    </div>
+
+    <!-- UPI Withdraw Form -->
+    <form id="upi-form" class="withdraw-form">
+      <input type="text" id="upiId" placeholder="Enter your UPI ID" required />
+      <input type="number" id="upiAmount" placeholder="Enter amount" required />
+      <p class="note">Minimum Withdraw ₹5</p>
+      <button class="withdraw-btn" type="submit">Withdraw</button>
+    </form>
+
+    <!-- Bank Withdraw Form -->
+    <form id="bank-form" class="withdraw-form hidden">
+      <input type="text" id="holderName" placeholder="Account holder name" required />
+      <input type="text" id="accountNumber" placeholder="Account number" required />
+      <input type="text" id="bankName" placeholder="Bank name" required />
+      <input type="text" id="ifscCode" placeholder="IFSC code" required />
+      <input type="number" id="bankAmount" placeholder="Enter amount" required />
+      <p class="note">Minimum Withdraw ₹5</p>
+      <button class="withdraw-btn" type="submit">Withdraw</button>
+    </form>
+  </div>
+
+
+       <div class="bottom-nav">
+            <a href="home page.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="invite.html" class="nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="wallet.html" class="nav-item active">
+                <i class="fas fa-wallet"></i> <span>Wallet</span>
+            </a>
+            <a href="profile-page.html" class="nav-item">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+
+    <script src="assets/wallet.js">
+    </script>
 </body>
 </html>

