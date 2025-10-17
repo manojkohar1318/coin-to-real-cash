@@ -58,7 +58,7 @@
             </div>
         </form>
 
-        <p class="signin-link">Already have an account? <a href="Login page.html">Login here</a></p>
+        <p class="signin-link">Already have an account? <a href="login.html">Login here</a></p>
     </div>
 <script>
     // START: ADDED JAVASCRIPT FOR SHOW/HIDE PASSWORD
@@ -101,7 +101,7 @@
         })
         .then(function(response) {
             alert("Account created successfully!");
-            window.location.href = "Login page.html"; // Redirect to login
+            window.location.href = "login.html"; // Redirect to login
         }, function(error) {
             alert("Failed to send account info: " + JSON.stringify(error));
         });
