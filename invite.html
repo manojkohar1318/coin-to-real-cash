@@ -1,64 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin To Real Cash - Invite Friends</title>
-    <link rel="stylesheet" href="assets/css/invite.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin To Real Cash - Invite Friends</title>
+<link rel="stylesheet" href="assets/css/invite.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// Function to generate unique 6-digit referral code
+function generateReferralCode() {
+  return Math.floor(100000 + Math.random() * 900000); // 6-digit number
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const referralInput = document.querySelector(".referral-code-input");
+
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      window.location.href = "login.html";
+      return;
+    }
+
+    const userRef = db.ref("users/" + user.uid);
+
+    // Initialize user with referral code if not exists
+    userRef.once("value").then(snapshot => {
+      if(snapshot.exists()){
+        const data = snapshot.val();
+        if(data.referralCode){
+          referralInput.value = data.referralCode; // use existing code
+        } else {
+          const newCode = generateReferralCode();
+          userRef.update({ referralCode: newCode });
+          referralInput.value = newCode;
+        }
+      } else {
+        const newCode = generateReferralCode();
+        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "", referralCode: newCode });
+        referralInput.value = newCode;
+      }
+    });
+  });
+
+  // Copy to clipboard
+  const copyBtn = document.querySelector(".fa-copy");
+  copyBtn.addEventListener("click", () => {
+    referralInput.select();
+    referralInput.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Referral code copied!");
+  });
+});
+</script>
+
 </head>
 <body>
-    <div class="container invite-page-container">
-    <h2 class="invite-main-title">Invite Friend and Get Bonus</h2>
-        <p class="invite-subtitle">Invite your Friend and Earn Coin</p>
+<div class="container invite-page-container">
+<h2 class="invite-main-title">Invite Friend and Get Bonus</h2>
+<p class="invite-subtitle">Invite your Friend and Earn Coin</p>
 
-        <div class="illustration-placeholder">
-            <!-- 
-                IMPORTANT: Ensure your image is in a folder named 'images' 
-                in the same directory as this HTML file.
-            -->
-            <img src="assets/image/invite-friend-illustration-svg-download-png-9394077.webp" alt="Refer A Friend Illustration">
-        </div>
+<div class="illustration-placeholder">
+    <img src="assets/image/invite-friend-illustration-svg-download-png-9394077.webp" alt="Refer A Friend Illustration">
+</div>
 
-        <div class="referral-code-section">
-            <div class="input-group referral-code-box">
-                <i class="fas fa-copy"></i>
-                <input type="text" value="781845" readonly class="referral-code-input">
-                <button class="share-button">Share</button>
-            </div>
-        </div>
-
-        <p class="have-referral-code"><a href="#">Have a Referral Code?</a></p>
-
-        <div class="social-media-invite">
-            <p>Invite by Social Media</p>
-            <div class="social-icons">
-                <a href="fb-messenger://share/?link=https%3A%2F%2Fyourdownloadlink.com&app_id=123456789" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://t.me/share/url?url=https%3A%2F%2Fyourdownloadlink.com&text=Use%20my%20referral%20code%20131531%20on%20signup." target="_blank" class="social-icon telegram"><i class="fab fa-telegram-plane"></i></a>
-                <a href="https://wa.me/?text=Use%20my%20referral%20code%20131531%20on%20signup.%20Download%20link%3A%20https%3A%2F%2Fyourdownloadlink.com" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-
-        <a href="#" class="referral-history-link" style="display: none;">Referral History</a>
+<div class="referral-code-section">
+    <div class="input-group referral-code-box">
+        <i class="fas fa-copy"></i>
+        <input type="text" value="" readonly class="referral-code-input">
+        <button class="share-button">Share</button>
     </div>
+</div>
 
-    <div class="bottom-nav">
-        <a href="home.html" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="invite.html" class="nav-item active">
-            <i class="fas fa-user-plus"></i>
-            <span>Invite</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i>
-            <span>Wallet</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i>
-            <span>Profile</span>
-        </a>
+<p class="have-referral-code"><a href="#">Have a Referral Code?</a></p>
+
+<div class="social-media-invite">
+    <p>Invite by Social Media</p>
+    <div class="social-icons">
+        <a href="fb-messenger://share/?link=https%3A%2F%2Fyourdownloadlink.com&app_id=123456789" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://t.me/share/url?url=https%3A%2F%2Fyourdownloadlink.com&text=Use%20my%20referral%20code%20on%20signup." target="_blank" class="social-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+        <a href="https://wa.me/?text=Use%20my%20referral%20code%20on%20signup.%20Download%20link%3A%20https%3A%2F%2Fyourdownloadlink.com" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
     </div>
+</div>
+
+<a href="#" class="referral-history-link" style="display: none;">Referral History</a>
+</div>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+    <a href="invite.html" class="nav-item active">
+        <i class="fas fa-user-plus"></i>
+        <span>Invite</span>
+    </a>
+    <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile</span>
+    </a>
+</div>
 </body>
 </html>

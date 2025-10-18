@@ -1,108 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin To Real Cash - Home</title>
-    <link rel="stylesheet" href="assets/css/home page.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin To Real Cash - Home</title>
+<link rel="stylesheet" href="assets/css/home page.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="header">
-        <h1>Welcome Back!</h1>
-        <p>Start earning coins today</p>
-    </div>
+<div class="header">
+    <h1>Welcome Back!</h1>
+    <p>Start earning coins today</p>
+</div>
 
-    <div class="container">
-        <div class="balance-card">
-            <div class="balance-top-row">
-                <p class="balance-label">Total Balance</p>
-            </div>
-            <div class="balance-amounts-row">
-                <p class="balance-coins" id="totalCoinsDisplay">0 Coins</p>
-                <p class="balance-rupees" id="totalRupeesDisplay">₹ 0</p>
-            </div>
+<div class="container">
+    <div class="balance-card">
+        <div class="balance-top-row">
+            <p class="balance-label">Total Balance</p>
         </div>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <p class="stat-label">Today's Earnings</p>
-                <p class="stat-value">0</p>
-            </div>
-            <div class="stat-card">
-                <p class="stat-label">Current Streak</p>
-                <p class="stat-value">1</p>
-            </div>
-        </div>
-
-        <div class="activities-section">
-            <h2 class="activities-title">Available Activities</h2>
-            <p class="activities-subtitle">Tap an activity to earn coins</p>
-
-            <div class="activities-grid">
-                <div class="activity-box daily-bonus">
-                    <i class="fas fa-gift"></i>
-                    <span>Daily Bonus</span>
-                </div>
-                <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
-                    <i class="fas fa-spinner"></i>
-                    <span>Spin Wheel</span>
-                </a>
-                <div class="activity-box scratch-cards">
-                    <i class="fas fa-scratchpad"></i>
-                    <span>Scratch Cards</span>
-                </div>
-                <div class="activity-box watch-ads">
-                    <i class="fas fa-video"></i>
-                    <span>Watch Ads</span>
-                </div>
-            </div>
+        <div class="balance-amounts-row">
+            <p class="balance-coins" id="totalCoinsDisplay">0 Coins</p>
+            <p class="balance-rupees" id="totalRupeesDisplay">₹ 0</p>
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <a href="home.html" class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="invite.html" class="nav-item">
-            <i class="fas fa-user-plus"></i>
-            <span>Invite</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i> <span>Wallet</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i>
-            <span>Profile</span>
+    <div class="stats-row">
+        <div class="stat-card">
+            <p class="stat-label">Today's Earnings</p>
+            <p class="stat-value" id="todaysEarnings">0</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Current Streak</p>
+            <p class="stat-value" id="currentStreak">0</p>
+        </div>
+    </div>
+
+    <div class="activities-section">
+        <h2 class="activities-title">Available Activities</h2>
+        <p class="activities-subtitle">Tap an activity to earn coins</p>
+
+        <div class="activities-grid">
+            <div class="activity-box daily-bonus">
+                <i class="fas fa-gift"></i>
+                <span>Daily Bonus</span>
+            </div>
+            <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
+                <i class="fas fa-spinner"></i>
+                <span>Spin Wheel</span>
             </a>
+            <div class="activity-box scratch-cards">
+                <i class="fas fa-scratchpad"></i>
+                <span>Scratch Cards</span>
+            </div>
+            <div class="activity-box watch-ads">
+                <i class="fas fa-video"></i>
+                <span>Watch Ads</span>
+            </div>
+        </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Define the conversion rate: 100 Coins = 1 Rupee
-            const COIN_TO_RUPEE_RATE = 100; 
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+    <a href="invite.html" class="nav-item">
+        <i class="fas fa-user-plus"></i>
+        <span>Invite</span>
+    </a>
+    <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i> <span>Wallet</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile</span>
+    </a>
+</div>
 
-            // Get the display elements using the new IDs
-            const coinsDisplay = document.getElementById('totalCoinsDisplay');
-            const rupeesDisplay = document.getElementById('totalRupeesDisplay');
-            
-            // Function to retrieve and display the balance
-            function loadBalance() {
-                // Get the balance from Local Storage, default to 0 if none is found
-                const mainBalance = parseInt(localStorage.getItem('mainBalance') || 0);
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-                // Calculate the rupee equivalent
-                const rupeeEquivalent = (mainBalance / COIN_TO_RUPEE_RATE).toFixed(2); 
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+    storageBucket: "coin-to-real-cash.firebasestorage.app",
+    messagingSenderId: "265929655267",
+    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
 
-                // Update the HTML display elements
-                coinsDisplay.textContent = mainBalance + ' Coins';
-                rupeesDisplay.textContent = '₹ ' + rupeeEquivalent;
+const auth = firebase.auth();
+const db = firebase.database();
+
+const totalCoinsDisplay = document.getElementById("totalCoinsDisplay");
+const totalRupeesDisplay = document.getElementById("totalRupeesDisplay");
+const todaysEarningsDisplay = document.getElementById("todaysEarnings");
+const currentStreakDisplay = document.getElementById("currentStreak");
+
+auth.onAuthStateChanged(user => {
+    if(user){
+        const userRef = db.ref("users/" + user.uid);
+
+        // initialize new user
+        userRef.once("value").then(snapshot => {
+            if(!snapshot.exists()){
+                userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
             }
-
-            // Run the function when the page loads
-            loadBalance();
         });
-    </script>
+
+        // live updates
+        userRef.on("value", snapshot => {
+            const data = snapshot.val();
+            if(data){
+                totalCoinsDisplay.textContent = data.coins + " Coins";
+                totalRupeesDisplay.textContent = "₹ " + (data.coins * 0.01);
+                todaysEarningsDisplay.textContent = data.todaysEarnings;
+                currentStreakDisplay.textContent = data.streak;
+            }
+        });
+    } else {
+        window.location.href = "login.html";
+    }
+});
+</script>
 </body>
 </html>

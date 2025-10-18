@@ -1,130 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Coin To Real Cash</title>
-    <link rel="stylesheet" href="assets/css/profile-page.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - Coin To Real Cash</title>
+<link rel="stylesheet" href="assets/css/profile-page.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="app-container">
+<div class="app-container">
+    <main class="profile-main">
+        <div class="user-info">
+            <div class="profile-avatar">
+                <img src="assets/image/user.png" alt="Profile Picture">
+            </div>
+            <div class="user-details">
+                <span class="username" id="profileUsername">Loading...</span>
+                <span class="email" id="profileEmail">Loading...</span>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <div class="my-coin-box">
+                <span>My Coin</span>
+                <i class="fas fa-coins"></i>
+                <span class="coin-count" id="profileCoinCount">0</span> 
+            </div>
+        </div>
         
-        <main class="profile-main">
-            <div class="user-info">
-                <div class="profile-avatar">
-                    <img src="assets/image/user.png" alt="Profile Picture">
+        <div class="menu-list">
+            <!-- Support Button with JS Mail Trigger -->
+            <a href="#" class="menu-item" id="supportBtn">
+                <div class="icon-bg orange-bg"><i class="fas fa-headset"></i></div>
+                <div class="item-text">
+                    <h3>Support</h3>
+                    <p>Contact us & send your Feedback</p>
                 </div>
-                <div class="user-details">
-                    <span class="username" id="profileUsername">Manoj@1318</span>
-                    <span class="email" id="profileEmail">manojkohart1326@gmail.com</span>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+
+            <a href="https://chadbulltrading.online/page/privacy-policy" class="menu-item">
+                <div class="icon-bg red-bg"><i class="fas fa-shield-alt"></i></div>
+                <div class="item-text">
+                    <h3>Privacy Policy</h3>
+                    <p>Click to read Privacy policy</p>
                 </div>
-            </div>
+                <i class="fas fa-chevron-right"></i>
+            </a>
 
-            <div class="profile-actions">
-                
-                <div class="my-coin-box">
-                    <span>My Coin</span>
-                    <i class="fas fa-coins"></i>
-                    <span class="coin-count" id="profileCoinCount">0</span> 
+            <a href="about.html" class="menu-item">
+                <div class="icon-bg lightblue-bg"><i class="fas fa-info"></i></div>
+                <div class="item-text">
+                    <h3>About us</h3>
+                    <p>About us</p>
                 </div>
-            </div>
-            
-            <div class="menu-list">
-                <a>
-                    
-                </a>
-                <a href="mailto:manojkohar1318@gmail.com" class="menu-item">
-                    <div class="icon-bg orange-bg"><i class="fas fa-headset"></i></div>
-                    <div class="item-text">
-                        <h3>Support</h3>
-                        <p>Contact us & send your Feedback</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <a href="https://chadbulltrading.online/page/privacy-policy" class="menu-item">
-                    <div class="icon-bg red-bg"><i class="fas fa-shield-alt"></i></div>
-                    <div class="item-text">
-                        <h3>Privacy Policy</h3>
-                        <p>Click to read Privacy policy</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <a href="about.html" class="menu-item">
-                    <div class="icon-bg lightblue-bg"><i class="fas fa-info"></i></div>
-                    <div class="item-text">
-                        <h3>About us</h3>
-                        <p>About us</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <a href="login.html" class="menu-item logout">
-                    <div class="icon-bg logout-bg"><i class="fas fa-sign-out-alt"></i></div>
-                    <div class="item-text">
-                        <h3>Logout</h3>
-                        <p>Logout this account</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <a href="index.html" class="menu-item delete-account">
-                    <div class="icon-bg delete-bg"><i class="fas fa-trash-alt"></i></div>
-                    <div class="item-text">
-                        <h3>Delete Account</h3>
-                        <p>After delete can't recover account</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </div>
-        </main>
+                <i class="fas fa-chevron-right"></i>
+            </a>
 
-        <nav class="bottom-nav">
-            <a href="home.html" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
+            <a href="login.html" class="menu-item logout">
+                <div class="icon-bg logout-bg"><i class="fas fa-sign-out-alt"></i></div>
+                <div class="item-text">
+                    <h3>Logout</h3>
+                    <p>Logout this account</p>
+                </div>
+                <i class="fas fa-chevron-right"></i>
             </a>
-            <a href="invite.html" class="nav-item">
-                <i class="fas fa-user-plus"></i>
-                <span>Invite</span>
-            </a>
-            <a href="wallet.html" class="nav-item">
-                <i class="fas fa-wallet"></i>
-                <span>Wallet</span>
-            </a>
-            <a href="profile.html" class="nav-item active">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-        </nav>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all display elements
-            const coinCountDisplay = document.getElementById('profileCoinCount');
-            const usernameDisplay = document.getElementById('profileUsername'); // New
-            const emailDisplay = document.getElementById('profileEmail');       // New
-            
-            // --- Coin Balance Logic ---
-            function loadProfileBalance() {
-                const mainBalance = parseInt(localStorage.getItem('mainBalance') || 0);
-                coinCountDisplay.textContent = mainBalance;
+            <a href="index.html" class="menu-item delete-account">
+                <div class="icon-bg delete-bg"><i class="fas fa-trash-alt"></i></div>
+                <div class="item-text">
+                    <h3>Delete Account</h3>
+                    <p>After delete can't recover account</p>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="invite.html" class="nav-item">
+            <i class="fas fa-user-plus"></i>
+            <span>Invite</span>
+        </a>
+        <a href="wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+    storageBucket: "coin-to-real-cash.firebasestorage.app",
+    messagingSenderId: "265929655267",
+    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const coinCountDisplay = document.getElementById('profileCoinCount');
+    const usernameDisplay = document.getElementById('profileUsername');
+    const emailDisplay = document.getElementById('profileEmail');
+    const supportBtn = document.getElementById('supportBtn');
+
+    auth.onAuthStateChanged(user => {
+        if(!user){
+            window.location.href = "login.html";
+            return;
+        }
+
+        const userRef = db.ref("users/" + user.uid);
+
+        // Initialize user if first time
+        userRef.once("value").then(snapshot => {
+            if(!snapshot.exists()){
+                userRef.set({ username: 'User', coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
             }
-            
-            // --- User Details Logic ---
-            function loadUserDetails() {
-                // Retrieve username and email from Local Storage
-                const savedUsername = localStorage.getItem('username');
-                const savedEmail = localStorage.getItem('email');
-
-                // Update the display elements, using default text if values aren't found
-                usernameDisplay.textContent = savedUsername || 'Guest User';
-                emailDisplay.textContent = savedEmail || 'No Email Provided';
-            }
-
-            // Run both functions when the page loads
-            loadProfileBalance();
-            loadUserDetails();
         });
-    </script>
+
+        // Live updates
+        userRef.on("value", snapshot => {
+            const data = snapshot.val();
+            if(data){
+                const username = data.username || 'User';
+                const userEmail = user.email || 'No Email';
+
+                coinCountDisplay.textContent = data.coins || 0;
+                usernameDisplay.textContent = username;
+                emailDisplay.textContent = userEmail;
+
+                // ✅ Support button mail trigger (with username & email in body)
+                supportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const subject = "Feedback";
+                    const body = `Hello Manoj,%0A%0AI am ${encodeURIComponent(username)} (${encodeURIComponent(userEmail)}).%0AI want to share my feedback:%0A`;
+                    window.location.href = `mailto:manojkohar1318@gmail.com?subject=${subject}&body=${body}`;
+                });
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

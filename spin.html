@@ -1,119 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spin Wheel</title>
-  <link rel="stylesheet" href="assets/css/spin.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin Wheel</title>
+<link rel="stylesheet" href="assets/css/spin.css">
 </head>
 <body>
 
-<a href="home.html" class="back-btn">
-  &#8592; Back
-</a>
-  <div class="container">
-    <!-- Fixed Pointer -->
+<a href="home.html" class="back-btn">&#8592; Back</a>
+
+<div class="container">
     <div class="pointer"></div>
+    <div class="wheel" id="wheel"></div>
+</div>
 
-    <!-- Wheel -->
-    <div class="wheel" id="wheel">
-      <!-- Segments will be added dynamically from JS -->
-    </div>
-  </div>
+<a href="#" class="spinBtn-2 btn">Play</a>
 
-  <!-- Play Button -->
-  <a href="#" class="spinBtn-2 btn">Play</a>
-
-  <!-- Popup Message -->
- <div class="overlay"></div>
-  <div class="message" id="winMessage">
-    </div>
+<div class="overlay"></div>
+<div class="message" id="winMessage"></div>
 
 <div id="balanceDisplay" style="position: fixed; top: 10px; right: 10px; padding: 10px; background: #fff; border: 1px solid #ccc; border-radius: 5px;">
     Balance: <span id="currentBalance">0</span>
 </div>
-  <script>
-  const wheel = document.getElementById('wheel');
-  const spinBtn2 = document.querySelector('.spinBtn-2');
-  const message = document.getElementById('winMessage');
-  const overlay = document.querySelector('.overlay');
-  const balanceDisplay = document.getElementById('currentBalance');
 
-  // --- Balance Management Functions ---
-  function getBalance() {
-      return parseInt(localStorage.getItem('mainBalance') || 0);
-  }
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-  function updateBalance(newBalance) {
-      localStorage.setItem('mainBalance', newBalance);
-      balanceDisplay.textContent = newBalance;
-  }
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+    storageBucket: "coin-to-real-cash.firebasestorage.app",
+    messagingSenderId: "265929655267",
+    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
 
-  // Initialize balance display on load
-  updateBalance(getBalance());
+const auth = firebase.auth();
+const db = firebase.database();
 
-  // --- Wheel Logic ---
-  const values = [2, 1, 50, 0, 100, 10, 5, 20];
-  const colors = ['#db7093', '#20b2aa', '#d63e92', '#daa520', '#ff34f0', '#ff7f50', '#3cb371', '#4169e1'];
+const wheel = document.getElementById('wheel');
+const spinBtn2 = document.querySelector('.spinBtn-2');
+const message = document.getElementById('winMessage');
+const overlay = document.querySelector('.overlay');
+const balanceDisplay = document.getElementById('currentBalance');
 
-  wheel.innerHTML = values.map((val, i) => `
-      <div class="number" style="--i:${i + 1}; --clr:${colors[i]}">
-          <span>${val}</span>
-      </div>
-  `).join('');
+const values = [2, 1, 50, 0, 100, 10, 5, 20];
+const colors = ['#db7093', '#20b2aa', '#d63e92', '#daa520', '#ff34f0', '#ff7f50', '#3cb371', '#4169e1'];
 
-  let deg = 0;
-  let currentPrize = 0;
+wheel.innerHTML = values.map((val,i)=>`<div class="number" style="--i:${i+1};--clr:${colors[i]}"><span>${val}</span></div>`).join('');
 
-  spinBtn2.addEventListener('click', (e) => {
-      e.preventDefault();
-      spinBtn2.style.pointerEvents = 'none';
-      message.innerHTML = '';
-      overlay.style.display = 'none';
-      message.style.display = 'none';
+let deg = 0;
+let currentPrize = 0;
 
-      const extraSpin = 3600;
-      const randomDegree = Math.floor(Math.random() * 360);
-      deg += extraSpin + randomDegree;
+auth.onAuthStateChanged(user => {
+    if(!user){
+        window.location.href = "login.html";
+        return;
+    }
+    const userRef = db.ref("users/" + user.uid);
 
-      wheel.style.transform = `rotate(${deg}deg)`;
+    // live balance update
+    userRef.on("value", snapshot => {
+        const data = snapshot.val();
+        if(data) balanceDisplay.textContent = data.coins;
+    });
 
-      setTimeout(() => {
-          const actualDeg = deg % 360;
-          const segmentAngle = 360 / values.length;
-          const offset = segmentAngle / 2;
-          const index = Math.floor((actualDeg + offset) / segmentAngle) % values.length;
-          currentPrize = values[(values.length - index + values.length) % values.length];
+    spinBtn2.addEventListener("click", e => {
+        e.preventDefault();
+        spinBtn2.style.pointerEvents = 'none';
+        message.style.display = 'none';
+        overlay.style.display = 'none';
 
-          // 🏆 Show winning message (only Add button now)
-          overlay.style.display = 'block';
-          message.style.display = 'block';
-          message.innerHTML = `
-              <h2>🎉 Congratulations!</h2>
-              <p>You won <span style="color:#1e90ff; font-weight:bold; font-size:1.5em;">${currentPrize}</span> coins!</p>
-              <div class="action-buttons">
-                  <button id="addBalanceBtn">Add to Main Balance</button>
-              </div>
-          `;
+        const extraSpin = 3600;
+        const randomDegree = Math.floor(Math.random()*360);
+        deg += extraSpin + randomDegree;
 
-          // 🟢 Add balance + close popup automatically
-          document.getElementById('addBalanceBtn').addEventListener('click', () => {
-              const currentBalance = getBalance();
-              const newBalance = currentBalance + currentPrize;
-              updateBalance(newBalance);
+        wheel.style.transform = `rotate(${deg}deg)`;
 
-              // Close popup after short delay
-              setTimeout(() => {
-                  overlay.style.display = 'none';
-                  message.style.display = 'none';
-                  spinBtn2.style.pointerEvents = 'auto';
-              }, 1000);
+        setTimeout(()=>{
+            const actualDeg = deg % 360;
+            const segmentAngle = 360 / values.length;
+            const offset = segmentAngle/2;
+            const index = Math.floor((actualDeg+offset)/segmentAngle) % values.length;
+            currentPrize = values[(values.length - index + values.length) % values.length];
 
-              currentPrize = 0;
-          });
+            overlay.style.display = 'block';
+            message.style.display = 'block';
+            message.innerHTML = `
+                <h2>🎉 Congratulations!</h2>
+                <p>You won <span style="color:#1e90ff; font-weight:bold; font-size:1.5em;">${currentPrize}</span> coins!</p>
+                <div class="action-buttons">
+                    <button id="addBalanceBtn">Add to Main Balance</button>
+                </div>
+            `;
 
-      }, 5000);
-  });
+            document.getElementById("addBalanceBtn").addEventListener("click", ()=>{
+                userRef.get().then(snapshot=>{
+                    const data = snapshot.val();
+                    const newCoins = (data.coins||0)+currentPrize;
+                    const newTodays = (data.todaysEarnings||0)+currentPrize;
+
+                    userRef.update({coins:newCoins, todaysEarnings:newTodays}).then(()=>{
+                        overlay.style.display='none';
+                        message.style.display='none';
+                        spinBtn2.style.pointerEvents='auto';
+                        currentPrize=0;
+                    });
+                });
+            });
+        }, 5000);
+    });
+});
 </script>
 </body>
 </html>

@@ -1,81 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet - Coin To Real Cash</title>
-    <link rel="stylesheet" href="assets/css/wallet.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet - Coin To Real Cash</title>
+<link rel="stylesheet" href="assets/css/wallet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-    <body>
-  <div class="container">
-    <header>
-      <h1>CoinToRealCash</h1>
-    </header>
-    <!-- Balance Display -->
-    <div class="balance-box">
-      <div class="balance-item">
-        <h3>Coins</h3>
-        <p id="wallet-balance">0</p>
-      </div>
-      <div class="divider"></div>
-      <div class="balance-item">
-        <h3>Rupees</h3>
-        <p id="winning-balance">₹0</p>
-      </div>
+<div class="container">
+  <header>
+    <h1>CoinToRealCash</h1>
+  </header>
+
+  <!-- Balance Display -->
+  <div class="balance-box">
+    <div class="balance-item">
+      <h3>Coins</h3>
+      <p id="wallet-balance">0</p>
     </div>
-
-    <!-- Withdraw Method -->
-    <div class="method-select">
-      <div class="method active" id="upi">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" />
-      </div>
-      <div class="method" id="bank">
-        <i class="fas fa-university"></i>
-      </div>
+    <div class="divider"></div>
+    <div class="balance-item">
+      <h3>Rupees</h3>
+      <p id="winning-balance">₹0</p>
     </div>
-
-    <!-- UPI Withdraw Form -->
-    <form id="upi-form" class="withdraw-form">
-      <input type="text" id="upiId" placeholder="Enter your UPI ID" required />
-      <input type="number" id="upiAmount" placeholder="Enter amount" required />
-      <p class="note">Minimum Withdraw ₹5</p>
-      <button class="withdraw-btn" type="submit">Withdraw</button>
-    </form>
-
-    <!-- Bank Withdraw Form -->
-    <form id="bank-form" class="withdraw-form hidden">
-      <input type="text" id="holderName" placeholder="Account holder name" required />
-      <input type="text" id="accountNumber" placeholder="Account number" required />
-      <input type="text" id="bankName" placeholder="Bank name" required />
-      <input type="text" id="ifscCode" placeholder="IFSC code" required />
-      <input type="number" id="bankAmount" placeholder="Enter amount" required />
-      <p class="note">Minimum Withdraw ₹5</p>
-      <button class="withdraw-btn" type="submit">Withdraw</button>
-    </form>
   </div>
 
+  <!-- Withdraw Method -->
+  <div class="method-select">
+    <div class="method active" id="upi">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" />
+    </div>
+    <div class="method" id="bank">
+      <i class="fas fa-university"></i>
+    </div>
+  </div>
 
-       <div class="bottom-nav">
-            <a href="home.html" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="invite.html" class="nav-item">
-                <i class="fas fa-user-plus"></i>
-                <span>Invite</span>
-            </a>
-            <a href="wallet.html" class="nav-item active">
-                <i class="fas fa-wallet"></i> <span>Wallet</span>
-            </a>
-            <a href="profile.html" class="nav-item">
-                <i class="fas fa-user-circle"></i>
-                <span>Profile</span>
-            </a>
-        </div>
+  <!-- UPI Withdraw Form -->
+  <form id="upi-form" class="withdraw-form">
+    <input type="text" id="upiId" placeholder="Enter your UPI ID" required />
+    <input type="number" id="upiAmount" placeholder="Enter amount" required />
+    <p class="note">Minimum Withdraw ₹5</p>
+    <button class="withdraw-btn" type="submit">Withdraw</button>
+  </form>
 
-    <script src="assets/wallet.js">
-    </script>
+  <!-- Bank Withdraw Form -->
+  <form id="bank-form" class="withdraw-form hidden">
+    <input type="text" id="holderName" placeholder="Account holder name" required />
+    <input type="text" id="accountNumber" placeholder="Account number" required />
+    <input type="text" id="bankName" placeholder="Bank name" required />
+    <input type="text" id="ifscCode" placeholder="IFSC code" required />
+    <input type="number" id="bankAmount" placeholder="Enter amount" required />
+    <p class="note">Minimum Withdraw ₹5</p>
+    <button class="withdraw-btn" type="submit">Withdraw</button>
+  </form>
+</div>
+
+<div class="bottom-nav">
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="invite.html" class="nav-item">
+    <i class="fas fa-user-plus"></i>
+    <span>Invite</span>
+  </a>
+  <a href="wallet.html" class="nav-item active">
+    <i class="fas fa-wallet"></i> <span>Wallet</span>
+  </a>
+  <a href="profile.html" class="nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+document.addEventListener("DOMContentLoaded", () => {
+  const walletBalanceEl = document.getElementById("wallet-balance");
+  const winningBalanceEl = document.getElementById("winning-balance");
+
+  const upiMethod = document.getElementById("upi");
+  const bankMethod = document.getElementById("bank");
+  const upiForm = document.getElementById("upi-form");
+  const bankForm = document.getElementById("bank-form");
+
+  // Switch between UPI and Bank forms
+  upiMethod.addEventListener("click", () => {
+    upiMethod.classList.add("active");
+    bankMethod.classList.remove("active");
+    upiForm.classList.remove("hidden");
+    bankForm.classList.add("hidden");
+  });
+  bankMethod.addEventListener("click", () => {
+    bankMethod.classList.add("active");
+    upiMethod.classList.remove("active");
+    bankForm.classList.remove("hidden");
+    upiForm.classList.add("hidden");
+  });
+
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      window.location.href = "login.html";
+      return;
+    }
+
+    const userRef = db.ref("users/" + user.uid);
+
+    // Initialize user if first time
+    userRef.once("value").then(snapshot => {
+      if(!snapshot.exists()){
+        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
+      }
+    });
+
+    // Live updates for balance
+    userRef.on("value", snapshot => {
+      const data = snapshot.val();
+      if(data){
+        const coins = data.coins || 0;
+        const rupees = (coins * 0.01).toFixed(2); // same conversion as Home page
+        walletBalanceEl.textContent = coins;
+        winningBalanceEl.textContent = `₹${rupees}`;
+      }
+    });
+  });
+
+  // UPI Withdraw
+  upiForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById("upiAmount").value);
+    const currentRupees = parseFloat(winningBalanceEl.textContent.replace('₹',''));
+    if(amount < 5) return alert("Minimum withdraw amount is ₹5");
+    if(amount > currentRupees) return alert("Insufficient balance");
+    alert(`₹${amount} withdrawal via UPI initiated!`);
+  });
+
+  // Bank Withdraw
+  bankForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById("bankAmount").value);
+    const currentRupees = parseFloat(winningBalanceEl.textContent.replace('₹',''));
+    if(amount < 5) return alert("Minimum withdraw amount is ₹5");
+    if(amount > currentRupees) return alert("Insufficient balance");
+    alert(`₹${amount} withdrawal via Bank initiated!`);
+  });
+});
+</script>
 </body>
 </html>
