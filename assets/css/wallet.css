@@ -1,12 +1,24 @@
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #f6f6f6;
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+html, body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #f6f6f6;
+}
+
+/* Main container */
 .container {
   width: 95%;
+  max-width: 500px;   /* Limit width on large screens */
   margin: 30px auto;
   background: white;
   border-radius: 20px;
@@ -14,6 +26,7 @@ body {
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
+/* Header */
 header {
   text-align: center;
   background: #1e90ff;
@@ -24,11 +37,12 @@ header {
   margin-bottom: 20px;
 }
 
+/* Balance Box */
 .balance-box {
   max-height: 60px;
   display: flex;
   font-size: 18px;
-  font-style: bold;
+  font-weight: bold;
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(to right, #1e90ff, #00c6d9);
@@ -50,10 +64,13 @@ header {
   margin: 0 10px;
 }
 
+/* Method selection */
 .method-select {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  flex-wrap: wrap; /* Wrap items on smaller screens */
+  gap: 10px;
 }
 
 .method {
@@ -70,6 +87,7 @@ header {
 
 .method img {
   width: 70px;
+  max-width: 90%; /* Scale on smaller screens */
 }
 
 .method i {
@@ -86,6 +104,7 @@ header {
   color: white;
 }
 
+/* Withdraw form */
 .withdraw-form {
   display: flex;
   flex-direction: column;
@@ -108,8 +127,7 @@ header {
 .note {
   text-align: right;
   font-size: 16px;
-  color: #333;
-  font-style: bold;
+  font-weight: bold;
   margin-top: -5px;
 }
 
@@ -128,42 +146,90 @@ header {
   background: #1e90ff;
 }
 
-
-/* Bottom Navigation (reused and adapted) */
+/* Bottom Navigation */
 .bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #fff;
-    border-top: 1px solid #eee;
-    padding: 10px 0;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-    z-index: 1000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
+  border-top: 1px solid #eee;
+  padding: 10px 0;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+  z-index: 1000;
 }
 
 .bottom-nav .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #888;
-    font-size: 12px;
-    padding: 5px;
-    flex: 1; /* Distribute items evenly */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #888;
+  font-size: 12px;
+  padding: 5px;
+  flex: 1; /* distribute items evenly */
 }
 
 .bottom-nav .nav-item i {
-    font-size: 22px;
-    margin-bottom: 3px;
+  font-size: 22px;
+  margin-bottom: 3px;
 }
 
 .bottom-nav .nav-item.active {
-    color: #007bff; /* Primary color for active item */
+  color: #007bff;
 }
 
 .bottom-nav .nav-item.active i {
-    color: #007bff;
+  color: #007bff;
+}
+
+/* ----------------- RESPONSIVE ----------------- */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .method {
+    width: 100px;
+    height: 70px;
+  }
+
+  .method img {
+    width: 60px;
+  }
+
+  .withdraw-form input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .withdraw-btn {
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: 95%;
+    margin: 20px auto;
+    padding: 10px;
+  }
+
+  .method {
+    width: 90px;
+    height: 60px;
+  }
+
+  .method img {
+    width: 50px;
+  }
+
+  .withdraw-btn {
+    font-size: 14px;
+    padding: 8px;
+  }
 }
