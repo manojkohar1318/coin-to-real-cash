@@ -40,18 +40,18 @@
         <p class="activities-subtitle">Tap an activity to earn coins</p>
 
         <div class="activities-grid">
-            <div class="activity-box daily-bonus">
+             <a href="dailybonus.html" class="activity-box daily-bonus" style="text-decoration: none;">
                 <i class="fas fa-gift"></i>
                 <span>Daily Bonus</span>
-            </div>
+            </a>
             <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
                 <i class="fas fa-spinner"></i>
                 <span>Spin Wheel</span>
             </a>
-            <div class="activity-box scratch-cards">
+            <a href="scratchcard.html" class="activity-box scratch-cards" style="text-decoration: none;">
                 <i class="fas fa-scratchpad"></i>
                 <span>Scratch Cards</span>
-            </div>
+            </a>
             <div class="activity-box watch-ads">
                 <i class="fas fa-video"></i>
                 <span>Watch Ads</span>
@@ -81,6 +81,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -92,41 +93,66 @@ const firebaseConfig = {
     messagingSenderId: "265929655267",
     appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
+
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.database();
+const firestore = firebase.firestore();
+
+// Enable offline persistence for Firestore
+firestore.enablePersistence().catch(err => {
+  console.log("Persistence error:", err.code);
+});
 
 const totalCoinsDisplay = document.getElementById("totalCoinsDisplay");
 const totalRupeesDisplay = document.getElementById("totalRupeesDisplay");
 const todaysEarningsDisplay = document.getElementById("todaysEarnings");
 const currentStreakDisplay = document.getElementById("currentStreak");
 
-auth.onAuthStateChanged(user => {
-    if(user){
-        const userRef = db.ref("users/" + user.uid);
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
-        // initialize new user
-        userRef.once("value").then(snapshot => {
-            if(!snapshot.exists()){
-                userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
-            }
-        });
+  const userRefRTDB = db.ref("users/" + user.uid);
+  const userRefFS = firestore.collection("users").doc(user.uid);
 
-        // live updates
-        userRef.on("value", snapshot => {
-            const data = snapshot.val();
-            if(data){
-                totalCoinsDisplay.textContent = data.coins + " Coins";
-                totalRupeesDisplay.textContent = "₹ " + (data.coins * 0.01);
-                todaysEarningsDisplay.textContent = data.todaysEarnings;
-                currentStreakDisplay.textContent = data.streak;
-            }
-        });
-    } else {
-        window.location.href = "login.html";
+  // 1️⃣ Try to show cached Firestore data first (instant)
+  userRefFS.get({ source: "cache" }).then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      updateUI(data);
     }
+  });
+
+  // 2️⃣ Sync data in real-time from RTDB (when online)
+  userRefRTDB.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      updateUI(data);
+      // Update Firestore for offline cache
+      userRefFS.set(data, { merge: true });
+    }
+  });
+
+  // 3️⃣ If no RTDB data yet, ensure Firestore has initial structure
+  const snapshot = await userRefRTDB.once("value");
+  if (!snapshot.exists()) {
+    const defaultData = { coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" };
+    userRefRTDB.set(defaultData);
+    userRefFS.set(defaultData);
+  }
 });
+
+// Function to update UI safely
+function updateUI(data) {
+  totalCoinsDisplay.textContent = `${data.coins} Coins`;
+  totalRupeesDisplay.textContent = "₹ " + (data.coins * 0.01).toFixed(2);
+  todaysEarningsDisplay.textContent = data.todaysEarnings || 0;
+  currentStreakDisplay.textContent = data.streak || 0;
+}
 </script>
 </body>
 </html>

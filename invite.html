@@ -31,6 +31,7 @@ function generateReferralCode() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const referralInput = document.querySelector(".referral-code-input");
+  const shareBtn = document.querySelector(".share-button");
 
   auth.onAuthStateChanged(user => {
     if(!user){
@@ -40,22 +41,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const userRef = db.ref("users/" + user.uid);
 
-    // Initialize user with referral code if not exists
     userRef.once("value").then(snapshot => {
+      let referralCode;
       if(snapshot.exists()){
         const data = snapshot.val();
         if(data.referralCode){
-          referralInput.value = data.referralCode; // use existing code
+          referralCode = data.referralCode;
+          referralInput.value = referralCode;
         } else {
-          const newCode = generateReferralCode();
-          userRef.update({ referralCode: newCode });
-          referralInput.value = newCode;
+          referralCode = generateReferralCode();
+          userRef.update({ referralCode: referralCode });
+          referralInput.value = referralCode;
         }
       } else {
-        const newCode = generateReferralCode();
-        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "", referralCode: newCode });
-        referralInput.value = newCode;
+        referralCode = generateReferralCode();
+        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "", referralCode: referralCode });
+        referralInput.value = referralCode;
       }
+
+      const message = `🎉 Hey! Check out Coin To Real Cash!\nGet started with my referral code: ${referralCode} and enjoy rewards instantly.\n📲 Download now: https://manojkohar1318.github.io/coin-to-real-cash/\nLet’s earn together! 💰`;
+
+      // Share button functionality
+      shareBtn.addEventListener("click", async () => {        
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Coin To Real Cash",
+              text: message,
+              url: "https://manojkohar1318.github.io/coin-to-real-cash/"
+            });
+          } catch (err) {
+            console.error("Share failed:", err.message);
+          }
+        } else {
+          referralInput.select();
+          referralInput.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+          alert("Referral code copied! You can now paste it in any app to share.");
+        }
+      });
+
+      // Update social media links dynamically
+      document.querySelector(".instagram").href = `https://www.instagram.com/?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodeURIComponent(message)}`;
+      document.querySelector(".telegram").href = `https://t.me/share/url?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodeURIComponent(message)}`;
+      document.querySelector(".whatsapp").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
     });
   });
 
@@ -93,13 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
 <div class="social-media-invite">
     <p>Invite by Social Media</p>
     <div class="social-icons">
-        <a href="fb-messenger://share/?link=https%3A%2F%2Fyourdownloadlink.com&app_id=123456789" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://t.me/share/url?url=https%3A%2F%2Fyourdownloadlink.com&text=Use%20my%20referral%20code%20on%20signup." target="_blank" class="social-icon telegram"><i class="fab fa-telegram-plane"></i></a>
-        <a href="https://wa.me/?text=Use%20my%20referral%20code%20on%20signup.%20Download%20link%3A%20https%3A%2F%2Fyourdownloadlink.com" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+        <a class="social-icon instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a class="social-icon telegram" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+        <a class="social-icon whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
     </div>
-</div>
-
-<a href="#" class="referral-history-link" style="display: none;">Referral History</a>
 </div>
 
 <div class="bottom-nav">

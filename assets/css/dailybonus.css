@@ -1,0 +1,113 @@
+/* ---------- BACK BUTTON ---------- */
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-weight: 600;
+  font-size: 1.2em;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 200;
+}
+.back-btn:hover {
+  background: #1e90ff;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* ---------- PAGE CONTAINER ---------- */
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;    
+    background: #b0e0e7;
+    margin: 0;
+}
+
+.bonus-container {
+    background-color: #bcb6b6;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 350px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+#bonus-message {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+#claim-button {
+    background-color: #fff;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 12px 35px;
+    border-radius: 8px;
+    border: 3px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+#claim-button:hover { background: #333; color: #fff; }
+#claim-button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+#countdown {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* ---------- POPUP ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 100;
+}
+
+.message {
+  white-space: nowrap;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 25px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  font-size: 18px;
+  font-weight: 600;
+  display: none;
+  z-index: 101;
+  text-align: center;
+}
+
+.action-buttons { margin-top: 20px; }
+
+#addBalanceBtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 25px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#addBalanceBtn:hover { background-color: #45a049; }
