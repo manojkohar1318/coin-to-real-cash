@@ -16,7 +16,6 @@
     <h2>Welcome</h2>
     <p class="subtitle">Sign in to continue</p>
 
-    <!-- ✅ Login form -->
     <form id="login-form">
       <div class="input-group">
         <i class="fas fa-envelope"></i>
@@ -30,7 +29,7 @@
       </div>
 
       <div class="forgot-password-link">
-        <a href="#">Forgot Password?</a>
+        <a href="forgot-password.html">Forgot Password?</a>
       </div>
 
       <button type="submit" class="login-btn">Login</button>
@@ -40,7 +39,6 @@
       <span>Continue with</span>
     </div>
 
-    <!-- ✅ Google Sign-In Button -->
     <button type="button" class="google-signin-btn" id="googleSignInBtn">
       <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google logo" class="google-icon" />
       Sign in with Google
@@ -51,85 +49,82 @@
     </p>
   </div>
 
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-      authDomain: "coin-to-real-cash.firebaseapp.com",
-      databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-      projectId: "coin-to-real-cash",
-      storageBucket: "coin-to-real-cash.firebasestorage.app",
-      messagingSenderId: "265929655267",
-      appId: "1:265929655267:web:7eb846fe7bd104761a56d6",
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6",
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const firestore = firebase.firestore();
+
+// Login form
+document.getElementById("login-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      alert("Login successful!");
+      window.location.href = "home.html";
+    })
+    .catch((error) => {
+      alert("Invalid login: " + error.message);
+    });
+});
+
+// Toggle password visibility
+function togglePasswordVisibility(id, icon) {
+  const input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+// Google Sign-In
+const googleSignInBtn = document.getElementById("googleSignInBtn");
+const provider = new firebase.auth.GoogleAuthProvider();
+
+googleSignInBtn.addEventListener("click", async () => {
+  try {
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+
+    // User data
+    const userData = {
+      uid: user.uid,
+      name: user.displayName || "",
+      email: user.email,
+      profilePic: user.photoURL || "",
+      createdAt: new Date().toISOString(),
+      coins: 0,
+      authProvider: "google" // mark provider
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-    const firestore = firebase.firestore();
+    // Save to Realtime Database
+    db.ref("users/" + user.uid).update(userData);
 
-    // ✅ Login form
-    document.getElementById("login-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value.trim();
+    // Save to Firestore (merge: true ensures existing data isn't overwritten)
+    firestore.collection("users").doc(user.uid).set(userData, { merge: true });
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          alert("Login successful!");
-          window.location.href = "home.html";
-        })
-        .catch((error) => {
-          alert("Invalid login: " + error.message);
-        });
-    });
-
-    // ✅ Toggle password visibility
-    function togglePasswordVisibility(id, icon) {
-      const input = document.getElementById(id);
-      input.type = input.type === "password" ? "text" : "password";
-    }
-
-    // ✅ Google Sign-In functionality
-    const googleSignInBtn = document.getElementById("googleSignInBtn");
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    googleSignInBtn.addEventListener("click", async () => {
-      try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-
-        // User data
-        const userData = {
-          uid: user.uid,
-          name: user.displayName,
-          email: user.email,
-          profilePic: user.photoURL,
-          createdAt: new Date().toISOString(),
-          coins: 0,
-          todaysEarnings: 0,
-          streak: 0,
-          lastDailyBonus: "",
-        };
-
-        // ✅ Save to Realtime Database
-        db.ref("users/" + user.uid).update(userData);
-
-        // ✅ Save to Firestore
-        firestore.collection("users").doc(user.uid).set(userData, { merge: true });
-
-        alert("Google Sign-In successful!");
-        window.location.href = "home.html";
-      } catch (error) {
-        console.error("Google Sign-In Error:", error);
-        alert("Google Sign-In failed: " + error.message);
-      }
-    });
-  </script>
+    alert("Google Sign-In successful!");
+    window.location.href = "home.html";
+  } catch (error) {
+    console.error("Google Sign-In Error:", error);
+    alert("Google Sign-In failed: " + error.message);
+  }
+});
+</script>
 </body>
 </html>

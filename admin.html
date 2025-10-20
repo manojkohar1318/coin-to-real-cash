@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Coin To Real Cash</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  h1 { margin-bottom: 20px; }
+  .login-section { max-width: 400px; margin: 50px auto; }
+  .login-section input { width: 100%; padding: 10px; margin-bottom: 10px; }
+  .login-section button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  .user-section { margin-bottom: 40px; }
+  .withdraw-card { background: #f9f9f9; padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .withdraw-card button { margin-top: 8px; margin-right: 5px; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+  .btn-approve { background: #28a745; color: white; }
+  .btn-reject { background: #dc3545; color: white; }
+  .status.Pending { color: #ff9900; font-weight: bold; }
+  .status.Approved { color: #28a745; font-weight: bold; }
+  .status.Rejected { color: #dc3545; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Admin Dashboard - Coin To Real Cash</h1>
+
+<div class="login-section" id="admin-login">
+  <h2>Admin Login</h2>
+  <input type="email" id="adminEmail" placeholder="Email" required>
+  <input type="password" id="adminPassword" placeholder="Password" required>
+  <button id="adminLoginBtn">Login</button>
+</div>
+
+<div id="admin-panel" style="display:none;">
+  <div id="users-container"></div>
+</div>
+
+<script>
+// Admin credentials
+const adminCredentials = {
+  "manojkohar1318@gmail.com": "Manoj@132%#"
+};
+
+// Dummy withdrawal data (offline)
+let dummyData = {
+  user1: {
+    req1: {
+      method: "upi",
+      amount: 500,
+      status: "Pending",
+      timestamp: Date.now(),
+      details: { upiId: "user1@upi" }
+    },
+    req2: {
+      method: "bank",
+      amount: 1000,
+      status: "Approved",
+      timestamp: Date.now() - 3600000,
+      details: { accountNumber: "1234567890", holderName: "User One", bankName: "State Bank" }
+    }
+  },
+  user2: {
+    req1: {
+      method: "upi",
+      amount: 250,
+      status: "Rejected",
+      timestamp: Date.now() - 7200000,
+      details: { upiId: "user2@upi" }
+    }
+  }
+};
+
+// Admin Login
+document.getElementById("adminLoginBtn").addEventListener("click", () => {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value.trim();
+
+  if (!adminCredentials[email] || adminCredentials[email] !== password) {
+    alert("Access Denied. Invalid admin credentials.");
+    return;
+  }
+
+  document.getElementById("admin-login").style.display = "none";
+  document.getElementById("admin-panel").style.display = "block";
+  loadWithdrawalRequests();
+});
+
+// Load & Display All Withdrawal Requests (offline)
+function loadWithdrawalRequests() {
+  const usersContainer = document.getElementById("users-container");
+  usersContainer.innerHTML = "";
+
+  Object.keys(dummyData).forEach(uid => {
+    const userRequests = dummyData[uid];
+    const userSection = document.createElement("div");
+    userSection.className = "user-section";
+    userSection.innerHTML = `<h2>User: ${uid}</h2>`;
+
+    Object.keys(userRequests).forEach(reqId => {
+      const req = userRequests[reqId];
+      const card = document.createElement("div");
+      card.className = "withdraw-card";
+      const method = req.method.toUpperCase();
+      const amount = req.amount;
+      const status = req.status;
+      const timestamp = new Date(req.timestamp).toLocaleString();
+      let detailsText = req.method === "upi" ? `UPI ID: ${req.details.upiId}`
+                                              : `Account: ${req.details.accountNumber}, Holder: ${req.details.holderName}, Bank: ${req.details.bankName}`;
+
+      card.innerHTML = `
+        <div><strong>${method} - ₹${amount}</strong></div>
+        <div>Details: ${detailsText}</div>
+        <div>Status: <span class="status ${status}">${status}</span></div>
+        <div>${timestamp}</div>
+        <button class="btn-approve">Approve</button>
+        <button class="btn-reject">Reject</button>
+      `;
+
+      // Approve button
+      card.querySelector(".btn-approve").addEventListener("click", () => {
+        req.status = "Approved";
+        card.querySelector(".status").textContent = "Approved";
+        card.querySelector(".status").className = "status Approved";
+      });
+
+      // Reject button
+      card.querySelector(".btn-reject").addEventListener("click", () => {
+        req.status = "Rejected";
+        card.querySelector(".status").textContent = "Rejected";
+        card.querySelector(".status").className = "status Rejected";
+      });
+
+      userSection.appendChild(card);
+    });
+
+    usersContainer.appendChild(userSection);
+  });
+}
+</script>
+</body>
+</html>

@@ -9,157 +9,240 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<style>
+.withdrawal-requests { margin-top: 30px; }
+.withdrawal-requests h3 { font-size: 1.3rem; margin-bottom: 10px; }
+#withdrawal-list { max-height: 300px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+.withdraw-card {
+  background: #f9f9f9;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+.withdraw-card .status { font-weight: bold; margin-top: 5px; }
+.withdraw-card .status.Pending { color: #ff9900; }
+.withdraw-card .status.Approved { color: #28a745; }
+.withdraw-card .status.Rejected { color: #dc3545; }
+.withdraw-card .details { font-size: 0.9rem; color: #555; margin-top: 3px; }
+.withdraw-card .note { font-size: 0.85rem; color: #333; margin-top: 5px; font-style: italic; }
+.withdraw-form { margin-top: 15px; }
+.withdraw-form input { display: block; margin-bottom: 10px; padding: 8px; width: 100%; }
+.withdraw-btn { padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+.method-select { display: flex; margin-bottom: 15px; gap: 10px; }
+.method { cursor: pointer; padding: 5px; border: 1px solid #ccc; border-radius: 5px; }
+.method.active { border-color: #007bff; }
+.hidden { display: none; }
+</style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>CoinToRealCash</h1>
-  </header>
+  <header><h1>CoinToRealCash</h1></header>
 
-  <!-- Balance Display -->
   <div class="balance-box">
-    <div class="balance-item">
-      <h3>Coins</h3>
-      <p id="wallet-balance">0</p>
-    </div>
-    <div class="divider"></div>
-    <div class="balance-item">
-      <h3>Rupees</h3>
-      <p id="winning-balance">₹0</p>
-    </div>
+      <div class="balance-item">
+          <h3>Coins</h3>
+          <p id="wallet-balance">0</p>
+      </div>
+      <div class="divider"></div>
+      <div class="balance-item">
+          <h3>Rupees</h3>
+          <p id="winning-balance">₹0</p>
+      </div>
   </div>
 
-  <!-- Withdraw Method -->
   <div class="method-select">
-    <div class="method active" id="upi">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" />
-    </div>
-    <div class="method" id="bank">
-      <i class="fas fa-university"></i>
-    </div>
+      <div class="method active" id="upi">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" />
+      </div>
+      <div class="method" id="bank"><i class="fas fa-university"></i></div>
   </div>
 
-  <!-- UPI Withdraw Form -->
+  <!-- UPI FORM -->
   <form id="upi-form" class="withdraw-form">
-    <input type="text" id="upiId" placeholder="Enter your UPI ID" required />
-    <input type="number" id="upiAmount" placeholder="Enter amount" required />
-    <p class="note">Minimum Withdraw ₹5</p>
-    <button class="withdraw-btn" type="submit">Withdraw</button>
+      <input type="text" id="upiId" placeholder="Enter your UPI ID" required />
+      <input type="number" id="upiAmount" placeholder="Enter amount" required />
+      <p class="note">Minimum Withdraw ₹5</p>
+      <button class="withdraw-btn" type="submit">Withdraw</button>
   </form>
 
-  <!-- Bank Withdraw Form -->
+  <!-- BANK FORM -->
   <form id="bank-form" class="withdraw-form hidden">
-    <input type="text" id="holderName" placeholder="Account holder name" required />
-    <input type="text" id="accountNumber" placeholder="Account number" required />
-    <input type="text" id="bankName" placeholder="Bank name" required />
-    <input type="text" id="ifscCode" placeholder="IFSC code" required />
-    <input type="number" id="bankAmount" placeholder="Enter amount" required />
-    <p class="note">Minimum Withdraw ₹5</p>
-    <button class="withdraw-btn" type="submit">Withdraw</button>
+      <input type="text" id="holderName" placeholder="Account holder name" required />
+      <input type="text" id="accountNumber" placeholder="Account number" required />
+      <input type="text" id="bankName" placeholder="Bank name" required />
+      <input type="text" id="ifscCode" placeholder="IFSC code" required />
+      <input type="number" id="bankAmount" placeholder="Enter amount" required />
+      <p class="note">Minimum Withdraw ₹5</p>
+      <button class="withdraw-btn" type="submit">Withdraw</button>
   </form>
+
+  <div class="withdrawal-requests">
+      <h3>Withdrawal Requests</h3>
+      <ul id="withdrawal-list"></ul>
+  </div>
 </div>
 
+<!-- Bottom Navigation -->
 <div class="bottom-nav">
-  <a href="home.html" class="nav-item">
-    <i class="fas fa-home"></i>
-    <span>Home</span>
-  </a>
-  <a href="invite.html" class="nav-item">
-    <i class="fas fa-user-plus"></i>
-    <span>Invite</span>
-  </a>
-  <a href="wallet.html" class="nav-item active">
-    <i class="fas fa-wallet"></i> <span>Wallet</span>
-  </a>
-  <a href="profile.html" class="nav-item">
-    <i class="fas fa-user-circle"></i>
-    <span>Profile</span>
-  </a>
+    <a href="home.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="invite.html" class="nav-item"><i class="fas fa-user-plus"></i><span>Invite</span></a>
+    <a href="wallet.html" class="nav-item active"><i class="fas fa-wallet"></i><span>Wallet</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i><span>Profile</span></a>
 </div>
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-  authDomain: "coin-to-real-cash.firebaseapp.com",
-  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-  projectId: "coin-to-real-cash",
-  storageBucket: "coin-to-real-cash.firebasestorage.app",
-  messagingSenderId: "265929655267",
-  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.database();
+const firestore = firebase.firestore();
 
 document.addEventListener("DOMContentLoaded", () => {
-  const walletBalanceEl = document.getElementById("wallet-balance");
-  const winningBalanceEl = document.getElementById("winning-balance");
+  const walletEl = document.getElementById("wallet-balance");
+  const rupeeEl = document.getElementById("winning-balance");
+  const upiForm = document.getElementById("upi-form");
+  const bankForm = document.getElementById("bank-form");
+  const listEl = document.getElementById("withdrawal-list");
+  const upiMethod = document.getElementById("upi");
+  const bankMethod = document.getElementById("bank");
 
-  const upiMethod = document.getElementById("upi");
-  const bankMethod = document.getElementById("bank");
-  const upiForm = document.getElementById("upi-form");
-  const bankForm = document.getElementById("bank-form");
+  // Toggle methods
+  upiMethod.onclick = () => {
+    upiForm.classList.remove("hidden");
+    bankForm.classList.add("hidden");
+    upiMethod.classList.add("active");
+    bankMethod.classList.remove("active");
+  };
+  bankMethod.onclick = () => {
+    bankForm.classList.remove("hidden");
+    upiForm.classList.add("hidden");
+    bankMethod.classList.add("active");
+    upiMethod.classList.remove("active");
+  };
 
-  // Switch between UPI and Bank forms
-  upiMethod.addEventListener("click", () => {
-    upiMethod.classList.add("active");
-    bankMethod.classList.remove("active");
-    upiForm.classList.remove("hidden");
-    bankForm.classList.add("hidden");
-  });
-  bankMethod.addEventListener("click", () => {
-    bankMethod.classList.add("active");
-    upiMethod.classList.remove("active");
-    bankForm.classList.remove("hidden");
-    upiForm.classList.add("hidden");
-  });
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return (window.location.href = "login.html");
 
-  auth.onAuthStateChanged(user => {
-    if(!user){
-      window.location.href = "login.html";
-      return;
-    }
+    const userRef = db.ref(`users/${user.uid}`);
+    const withdrawalRef = db.ref(`withdrawals/${user.uid}`);
 
-    const userRef = db.ref("users/" + user.uid);
+    // Ensure user exists
+    const snap = await userRef.once("value");
+    if (!snap.exists()) {
+      await userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
+    }
 
-    // Initialize user if first time
-    userRef.once("value").then(snapshot => {
-      if(!snapshot.exists()){
-        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
-      }
-    });
+    // Sync balance
+    userRef.on("value", (snapshot) => {
+      const data = snapshot.val() || {};
+      walletEl.textContent = data.coins || 0;
+      rupeeEl.textContent = `₹${((data.coins || 0) * 0.01).toFixed(2)}`;
+    });
 
-    // Live updates for balance
-    userRef.on("value", snapshot => {
-      const data = snapshot.val();
-      if(data){
-        const coins = data.coins || 0;
-        const rupees = (coins * 0.01).toFixed(2); // same conversion as Home page
-        walletBalanceEl.textContent = coins;
-        winningBalanceEl.textContent = `₹${rupees}`;
-      }
-    });
-  });
+    // Display withdrawal requests
+    withdrawalRef.on("value", (snapshot) => {
+      listEl.innerHTML = "";
+      snapshot.forEach((child) => {
+        const req = child.val();
+        const details = req.method === "upi"
+          ? `UPI: ${req.details.upiId}`
+          : `Acc: ${req.details.accountNumber}, IFSC: ${req.details.ifscCode}`;
+        const time = new Date(req.timestamp).toLocaleString();
+        const li = `
+          <li>
+            <div class="withdraw-card ${req.status}">
+              <div><strong>${req.method.toUpperCase()} - ₹${req.amount}</strong></div>
+              <div class="details">${details}</div>
+              <div class="status ${req.status}">${req.status}</div>
+              <div class="note">Your request will be approved within 24 hrs</div>
+              <div class="details">${time}</div>
+            </div>
+          </li>`;
+        listEl.insertAdjacentHTML("afterbegin", li);
+      });
+    });
 
-  // UPI Withdraw
-  upiForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const amount = parseFloat(document.getElementById("upiAmount").value);
-    const currentRupees = parseFloat(winningBalanceEl.textContent.replace('₹',''));
-    if(amount < 5) return alert("Minimum withdraw amount is ₹5");
-    if(amount > currentRupees) return alert("Insufficient balance");
-    alert(`₹${amount} withdrawal via UPI initiated!`);
-  });
+    // Submit withdrawal function
+    async function submitWithdrawal(request, amountInRupees) {
+      const amountInCoins = amountInRupees * 100;
+      try {
+        const userSnapshot = await userRef.once("value");
+        const currentCoins = userSnapshot.val().coins || 0;
+        if (currentCoins < amountInCoins) { alert("Insufficient balance!"); return; }
 
-  // Bank Withdraw
-  bankForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const amount = parseFloat(document.getElementById("bankAmount").value);
-    const currentRupees = parseFloat(winningBalanceEl.textContent.replace('₹',''));
-    if(amount < 5) return alert("Minimum withdraw amount is ₹5");
-    if(amount > currentRupees) return alert("Insufficient balance");
-    alert(`₹${amount} withdrawal via Bank initiated!`);
-  });
+        // Generate new key
+        const newRef = withdrawalRef.push();
+
+        // Store in Realtime DB
+        await newRef.set(request);
+
+        // Store in Firestore
+        await firestore.collection("withdrawals")
+          .doc(user.uid)
+          .collection("requests")
+          .doc(newRef.key)
+          .set(request);
+
+        // Deduct coins AFTER DB writes succeed
+        await userRef.update({ coins: currentCoins - amountInCoins });
+
+        alert("Withdrawal request submitted successfully!");
+      } catch (err) {
+        console.error("Withdrawal error:", err);
+        alert("Failed to submit request. Please try again.");
+      }
+    }
+
+    // Refund rejected requests
+    withdrawalRef.on("child_changed", async (snapshot) => {
+      const updated = snapshot.val();
+      if (updated.status === "Rejected") {
+        const refundCoins = updated.amount * 100;
+        const userSnapshot = await userRef.once("value");
+        const coins = userSnapshot.val().coins || 0;
+        await userRef.update({ coins: coins + refundCoins });
+      }
+    });
+
+    // UPI form submission
+    upiForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const upiId = document.getElementById("upiId").value.trim();
+      const amount = parseFloat(document.getElementById("upiAmount").value);
+      if (!upiId || amount < 5) return alert("Enter valid UPI ID and minimum ₹5.");
+      const request = { method: "upi", details: { upiId }, amount, status: "Pending", timestamp: Date.now() };
+      await submitWithdrawal(request, amount);
+      upiForm.reset();
+    };
+
+    // Bank form submission
+    bankForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const holderName = document.getElementById("holderName").value.trim();
+      const accountNumber = document.getElementById("accountNumber").value.trim();
+      const bankName = document.getElementById("bankName").value.trim();
+      const ifscCode = document.getElementById("ifscCode").value.trim();
+      const amount = parseFloat(document.getElementById("bankAmount").value);
+      if (!holderName || !accountNumber || !bankName || !ifscCode || amount < 5)
+        return alert("Please fill all bank details and enter minimum ₹5.");
+      const request = { method: "bank", details: { holderName, accountNumber, bankName, ifscCode }, amount, status: "Pending", timestamp: Date.now() };
+      await submitWithdrawal(request, amount);
+      bankForm.reset();
+    };
+  });
 });
 </script>
 </body>
