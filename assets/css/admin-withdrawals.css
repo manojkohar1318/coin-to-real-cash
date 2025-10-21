@@ -1,0 +1,131 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f6f8fc;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+header {
+  background: #1e90ff;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+  .btn {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn.small { padding: 6px 10px; font-size: 14px; }
+    .btn.cancel { background-color: #aaa; }
+
+    .btn:hover { opacity: 0.9; }
+
+.admin-container {
+  padding: 20px;
+}
+
+.columns {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.column {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  height: 80vh;
+  overflow-y: auto;
+}
+
+.column h2 {
+  text-align: center;
+  color: #1e90ff;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #1e90ff;
+  padding-bottom: 5px;
+}
+
+.withdraw-card {
+  background: #f9fbff;
+  border: 1px solid #dce7ff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  transition: transform 0.2s;
+}
+
+.withdraw-card:hover {
+  transform: scale(1.02);
+}
+
+.details {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.user-id {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: white;
+  background-color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button.approve {
+  background: #28a745;
+}
+
+button.reject {
+  background: #dc3545;
+}
+
+.status {
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}

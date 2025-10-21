@@ -1,0 +1,143 @@
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f0f4ff;
+  color: #222;
+}
+
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  padding: 15px 10px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+header button {
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+header h2 {
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+#withdrawal-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.withdraw-card {
+  background: white;
+  padding: 15px 18px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+  border-left: 5px solid #007bff;
+  border-top: 5px solid #007bff;
+}
+
+.withdraw-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.withdraw-card strong {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.withdraw-card .details {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 6px;
+}
+
+.withdraw-card small {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 4px;
+  display: block;
+}
+
+.status {
+  font-weight: bold;
+  margin-top: 8px;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.status.Pending {
+  color: #ff9800;
+  background: rgba(255, 193, 7, 0.15);
+}
+
+.status.Approved {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.15);
+}
+
+.status.Rejected {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.15);
+}
+
+.empty-message {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 40px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+}
+
+.nav-item {
+  text-align: center;
+  color: #555;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.nav-item i {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 3px;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  color: #007bff;
+}

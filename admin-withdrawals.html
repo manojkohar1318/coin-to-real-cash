@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Withdrawal Requests</title>
+  <link rel="stylesheet" href="assets/css/admin-withdrawals.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+
+<body>
+  <div class="admin-container">
+    <header>
+      <h1>Admin Dashboard</h1>
+      <div class="admin-actions">
+        <button id="changePassBtn" class="pass-btn">
+          <i class="fas fa-key"></i> Change Password
+        </button>
+        <button id="logoutBtn" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <div class="columns">
+      <div class="column" id="pending-column">
+        <h2>Pending Requests</h2>
+        <ul id="pending-list"></ul>
+      </div>
+
+      <div class="column" id="approved-column">
+        <h2>Approved Requests</h2>
+        <ul id="approved-list"></ul>
+      </div>
+
+      <div class="column" id="rejected-column">
+        <h2>Rejected Requests</h2>
+        <ul id="rejected-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ✅ Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const realtimeDB = firebase.database();
+
+  const pendingList = document.getElementById("pending-list");
+  const approvedList = document.getElementById("approved-list");
+  const rejectedList = document.getElementById("rejected-list");
+
+  // ✅ Create HTML card for each request
+  function createRequestCard(uid, reqId, data) {
+    const details =
+      data.method === "upi"
+        ? `UPI ID: ${data.details?.upiId || "N/A"}`
+        : `Account: ${data.details?.accountNumber || "N/A"}, IFSC: ${data.details?.ifscCode || "N/A"}`;
+
+    const time = data.timestamp ? new Date(data.timestamp).toLocaleString() : "N/A";
+
+    const card = document.createElement("li");
+    card.classList.add("withdraw-card");
+    card.innerHTML = `
+      <div class="info">
+        <strong>${data.method?.toUpperCase() || "Unknown"} - ₹${data.amount || 0}</strong>
+        <div class="details">${details}</div>
+        <small>${time}</small>
+        <p class="user-id">User ID: ${uid}</p>
+      </div>
+      <div class="actions">
+        ${
+          data.status === "Pending"
+            ? `
+              <textarea id="remark-${reqId}" class="remark-input" placeholder="Add remark..."></textarea>
+              <button class="approve" onclick="updateStatus('${uid}','${reqId}','Approved')">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="reject" onclick="updateStatus('${uid}','${reqId}','Rejected')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            `
+            : `<span class="status ${data.status.toLowerCase()}">${data.status}</span><br><small>${data.remark || ""}</small>`
+        }
+      </div>
+    `;
+    return card;
+  }
+
+  // ✅ Render all requests
+  function renderRequests(snapshot) {
+    pendingList.innerHTML = "";
+    approvedList.innerHTML = "";
+    rejectedList.innerHTML = "";
+
+    if (!snapshot.exists()) {
+      pendingList.innerHTML = "<p>No withdrawal requests found.</p>";
+      return;
+    }
+
+    snapshot.forEach((userSnap) => {
+      const uid = userSnap.key;
+      const requests = userSnap.val();
+
+      // sort by latest first
+      const sorted = Object.entries(requests).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+
+      sorted.forEach(([reqId, data]) => {
+        const card = createRequestCard(uid, reqId, data);
+        if (data.status === "Approved") {
+          approvedList.appendChild(card);
+        } else if (data.status === "Rejected") {
+          rejectedList.appendChild(card);
+        } else {
+          pendingList.appendChild(card);
+        }
+      });
+    });
+  }
+
+  // ✅ Update status in database
+  function updateStatus(uid, reqId, newStatus) {
+    const remark = document.getElementById(`remark-${reqId}`)?.value || "";
+    const updates = {
+      status: newStatus,
+      remark: remark,
+    };
+
+    realtimeDB
+      .ref(`withdrawals/${uid}/${reqId}`)
+      .update(updates)
+      .then(() => {
+        alert(`Request marked as ${newStatus}`);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to update status. Please try again.");
+      });
+  }
+
+  // ✅ Listen for all withdrawal requests
+  realtimeDB.ref("withdrawals").on("value", renderRequests);
+
+  // ✅ Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  });
+
+  // ✅ Send password reset (OTP verification)
+  document.getElementById("changePassBtn").addEventListener("click", () => {
+    const adminEmail = "cointorealcash@gmail.com";
+
+    auth.sendPasswordResetEmail(adminEmail)
+      .then(() => {
+        alert("A password reset (OTP verification) email has been sent to cointorealcash@gmail.com. Please check your inbox.");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Error: " + error.message);
+      });
+  });
+
+  // ✅ Restrict access to admin only
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (user.email !== "cointorealcash@gmail.com") {
+      alert("Access denied. Admin only.");
+      window.location.href = "home.html";
+      return;
+    }
+
+    console.log("👑 Admin logged in:", user.email);
+  });
+  </script>
+
+  <style>
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pass-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .remark-input {
+      width: 100%;
+      height: 60px;
+      margin-bottom: 8px;
+      resize: none;
+      border-radius: 6px;
+      padding: 6px;
+    }
+  </style>
+</body>
+</html>
