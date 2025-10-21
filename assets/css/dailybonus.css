@@ -27,12 +27,12 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;    
-    background: #b0e0e7;
+    background: #ffffff;
     margin: 0;
 }
 
 .bonus-container {
-    background-color: #bcb6b6;
+    background-color: #00c6d9;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
