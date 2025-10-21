@@ -49,98 +49,110 @@
     </p>
   </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-  authDomain: "coin-to-real-cash.firebaseapp.com",
-  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-  projectId: "coin-to-real-cash",
-  storageBucket: "coin-to-real-cash.firebasestorage.app",
-  messagingSenderId: "265929655267",
-  appId: "1:265929655267:web:7eb846fe7bd104761a56d6",
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-const firestore = firebase.firestore();
-
-// 🔐 Login form
-document.getElementById("login-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value.trim();
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      // ✅ Admin check
-      if (email === "cointorealcash@gmail.com" && password === "Manoj@1318%#") {
-        alert("Admin login successful!");
-        window.location.href = "admin-withdrawals.html";
-      } else {
-        alert("Login successful!");
-        window.location.href = "home.html";
-      }
-    })
-    .catch((error) => {
-      alert("Invalid login: " + error.message);
-    });
-});
-
-// 👁 Toggle password visibility
-function togglePasswordVisibility(id, icon) {
-  const input = document.getElementById(id);
-  if (input.type === "password") {
-    input.type = "text";
-    icon.classList.add("active");
-  } else {
-    input.type = "password";
-    icon.classList.remove("active");
-  }
-}
-
-// 🌐 Google Sign-In
-const googleSignInBtn = document.getElementById("googleSignInBtn");
-const provider = new firebase.auth.GoogleAuthProvider();
-
-googleSignInBtn.addEventListener("click", async () => {
-  try {
-    const result = await auth.signInWithPopup(provider);
-    const user = result.user;
-
-    const userData = {
-      uid: user.uid,
-      name: user.displayName || "",
-      email: user.email,
-      profilePic: user.photoURL || "",
-      createdAt: new Date().toISOString(),
-      coins: 0,
-      authProvider: "google",
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+      authDomain: "coin-to-real-cash.firebaseapp.com",
+      databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+      projectId: "coin-to-real-cash",
+      storageBucket: "coin-to-real-cash.firebasestorage.app",
+      messagingSenderId: "265929655267",
+      appId: "1:265929655267:web:7eb846fe7bd104761a56d6",
     };
 
-    // Save to Realtime DB + Firestore
-    db.ref("users/" + user.uid).update(userData);
-    firestore.collection("users").doc(user.uid).set(userData, { merge: true });
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const firestore = firebase.firestore();
 
-    // 🔐 Redirect admin if Google sign-in email matches admin
-    if (user.email === "cointorealcash@gmail.com") {
-      alert("Admin login successful!");
-      window.location.href = "admin-withdrawals.html";
-    } else {
-      alert("Google Sign-In successful!");
-      window.location.href = "home.html";
+    // 🔁 Check if user is already logged in
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // If already logged in, go to home (or admin page if admin)
+        if (user.email === "cointorealcash@gmail.com") {
+          window.location.href = "admin-withdrawals.html";
+        } else {
+          window.location.href = "home.html";
+        }
+      }
+    });
+
+    // 🔐 Login form
+    document.getElementById("login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          // ✅ Admin check
+          if (email === "cointorealcash@gmail.com" && password === "Manoj@1318%#") {
+            alert("Admin login successful!");
+            window.location.href = "admin-withdrawals.html";
+          } else {
+            alert("Login successful!");
+            window.location.href = "home.html";
+          }
+        })
+        .catch((error) => {
+          alert("Invalid login: " + error.message);
+        });
+    });
+
+    // 👁 Toggle password visibility
+    function togglePasswordVisibility(id, icon) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.add("active");
+      } else {
+        input.type = "password";
+        icon.classList.remove("active");
+      }
     }
 
-  } catch (error) {
-    console.error("Google Sign-In Error:", error);
-    alert("Google Sign-In failed: " + error.message);
-  }
-});
-</script>
+    // 🌐 Google Sign-In
+    const googleSignInBtn = document.getElementById("googleSignInBtn");
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    googleSignInBtn.addEventListener("click", async () => {
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        const userData = {
+          uid: user.uid,
+          name: user.displayName || "",
+          email: user.email,
+          profilePic: user.photoURL || "",
+          createdAt: new Date().toISOString(),
+          coins: 0,
+          authProvider: "google",
+        };
+
+        // Save to Realtime DB + Firestore
+        db.ref("users/" + user.uid).update(userData);
+        firestore.collection("users").doc(user.uid).set(userData, { merge: true });
+
+        // 🔐 Redirect admin if Google sign-in email matches admin
+        if (user.email === "cointorealcash@gmail.com") {
+          alert("Admin login successful!");
+          window.location.href = "admin-withdrawals.html";
+        } else {
+          alert("Google Sign-In successful!");
+          window.location.href = "home.html";
+        }
+
+      } catch (error) {
+        console.error("Google Sign-In Error:", error);
+        alert("Google Sign-In failed: " + error.message);
+      }
+    });
+  </script>
 </body>
 </html>

@@ -32,7 +32,6 @@
         </div>
         
         <div class="menu-list">
-            <!-- Support Button with JS Mail Trigger -->
             <a href="#" class="menu-item" id="supportBtn">
                 <div class="icon-bg orange-bg"><i class="fas fa-headset"></i></div>
                 <div class="item-text">
@@ -60,7 +59,7 @@
                 <i class="fas fa-chevron-right"></i>
             </a>
 
-            <a href="index.html" class="menu-item logout">
+            <a href="#" class="menu-item logout" id="logoutBtn">
                 <div class="icon-bg logout-bg"><i class="fas fa-sign-out-alt"></i></div>
                 <div class="item-text">
                     <h3>Logout</h3>
@@ -110,23 +109,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const usernameDisplay = document.getElementById('profileUsername');
     const emailDisplay = document.getElementById('profileEmail');
     const supportBtn = document.getElementById('supportBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
 
     auth.onAuthStateChanged(user => {
         if(!user){
-            window.location.href = "login.html";
+            window.location.href = "index.html"; // redirect if not logged in
             return;
         }
 
         const userRef = db.ref("users/" + user.uid);
 
-        // Initialize user if first time
         userRef.once("value").then(snapshot => {
             if(!snapshot.exists()){
                 userRef.set({ username: 'User', coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
             }
         });
 
-        // Live updates
         userRef.on("value", snapshot => {
             const data = snapshot.val();
             if(data){
@@ -137,14 +135,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 usernameDisplay.textContent = username;
                 emailDisplay.textContent = userEmail;
 
-                // ✅ Support button mail trigger (with username & email in body)
                 supportBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const subject = "Feedback";
-                    const body = `Hello Manoj,%0A%0AI am ${encodeURIComponent(username)} (${encodeURIComponent(userEmail)}).%0AI want to share my feedback:%0A`;
+                    const body = `Hello Manoj,%0A%0AI am ${encodeURIComponent(username)}.%0AI want to share my feedback:%0A`;
                     window.location.href = `mailto:cointorealcash@gmail.com?subject=${subject}&body=${body}`;
                 });
             }
+        });
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        auth.signOut().then(() => {
+            window.location.href = "index.html";
         });
     });
 });

@@ -9,73 +9,75 @@
 </head>
 <body>
 <div class="header">
-    <h1>Welcome Back!</h1>
-    <p>Start earning coins today</p>
+  <h1>Welcome Back!</h1>
+  <p>Start earning coins today</p>
 </div>
 
 <div class="container">
-    <div class="balance-card">
-        <div class="balance-top-row">
-            <p class="balance-label">Total Balance</p>
-        </div>
-        <div class="balance-amounts-row">
-            <p class="balance-coins" id="totalCoinsDisplay">0 Coins</p>
-            <p class="balance-rupees" id="totalRupeesDisplay">₹ 0</p>
-        </div>
+  <div class="balance-card">
+    <div class="balance-top-row">
+      <p class="balance-label">Total Balance</p>
     </div>
-
-    <div class="stats-row">
-        <div class="stat-card">
-            <p class="stat-label">Today's Earnings</p>
-            <p class="stat-value" id="todaysEarnings">0</p>
-        </div>
-        <div class="stat-card">
-            <p class="stat-label">Current Streak</p>
-            <p class="stat-value" id="currentStreak">0</p>
-        </div>
+    <div class="balance-amounts-row">
+      <p class="balance-coins" id="totalCoinsDisplay">0 Coins</p>
+      <p class="balance-rupees" id="totalRupeesDisplay">₹ 0</p>
     </div>
+  </div>
 
-    <div class="activities-section">
-        <h2 class="activities-title">Available Activities</h2>
-        <p class="activities-subtitle">Tap an activity to earn coins</p>
-
-        <div class="activities-grid">
-             <a href="dailybonus.html" class="activity-box daily-bonus" style="text-decoration: none;">
-                <i class="fas fa-gift"></i>
-                <span>Daily Bonus</span>
-            </a>
-            <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
-                <i class="fas fa-spinner"></i>
-                <span>Spin Wheel</span>
-            </a>
-            <a href="scratchcard.html" class="activity-box scratch-cards" style="text-decoration: none;">
-                <i class="fas fa-scratchpad"></i>
-                <span>Scratch Cards</span>
-            </a>
-            <div class="activity-box watch-ads">
-                <i class="fas fa-video"></i>
-                <span>Watch Ads</span>
-            </div>
-        </div>
+  <div class="refer-section">
+    <div class="refer-content">
+      <div class="refer-text">
+        <h3>Refer your friend and<br>get <span class="highlight">500 Coins</span></h3>
+      </div>
+      <div class="refer-icon">
+        <i class="fab fa-telegram-plane"></i>
+      </div>
     </div>
+    <button class="refer-btn" id="referNowBtn">Refer Now</button>
+  </div>
+
+  <div class="activities-section">
+    <h2 class="activities-title">Available Activities</h2>
+    <p class="activities-subtitle">Tap an activity to earn coins</p>
+
+    <div class="activities-grid">
+      <a href="dailybonus.html" class="activity-box daily-bonus" style="text-decoration: none;">
+        <i class="fas fa-gift"></i>
+        <span>Daily Bonus</span>
+      </a>
+      <a href="spin.html" class="activity-box spin-wheel" style="text-decoration: none;">
+        <i class="fas fa-spinner"></i>
+        <span>Spin Wheel</span>
+      </a>
+      <a href="scratchcard.html" class="activity-box scratch-cards" style="text-decoration: none;">
+        <i class="fas fa-scratchpad"></i>
+        <span>Scratch Cards</span>
+      </a>
+      <div class="activity-box watch-ads">
+        <i class="fas fa-video"></i>
+        <span>Watch Ads</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="bottom-nav">
-    <a href="home.html" class="nav-item active">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-    </a>
-    <a href="invite.html" class="nav-item">
-        <i class="fas fa-user-plus"></i>
-        <span>Invite</span>
-    </a>
-    <a href="wallet.html" class="nav-item">
-        <i class="fas fa-wallet"></i> <span>Wallet</span>
-    </a>
-    <a href="profile.html" class="nav-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profile</span>
-    </a>
+  <a href="home.html" class="nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="invite.html" class="nav-item">
+    <i class="fas fa-user-plus"></i>
+    <span>Invite</span>
+  </a>
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <span>Wallet</span>
+  </a>
+  <a href="profile.html" class="nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -84,75 +86,87 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-    authDomain: "coin-to-real-cash.firebaseapp.com",
-    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-    projectId: "coin-to-real-cash",
-    storageBucket: "coin-to-real-cash.firebasestorage.app",
-    messagingSenderId: "265929655267",
-    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.database();
 const firestore = firebase.firestore();
-
-// Enable offline persistence for Firestore
-firestore.enablePersistence().catch(err => {
-  console.log("Persistence error:", err.code);
-});
+firestore.enablePersistence().catch(err => console.log("Persistence error:", err.code));
 
 const totalCoinsDisplay = document.getElementById("totalCoinsDisplay");
 const totalRupeesDisplay = document.getElementById("totalRupeesDisplay");
-const todaysEarningsDisplay = document.getElementById("todaysEarnings");
-const currentStreakDisplay = document.getElementById("currentStreak");
 
+// 🔐 Check login
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "index.html"; // redirect if not logged in
     return;
   }
 
   const userRefRTDB = db.ref("users/" + user.uid);
   const userRefFS = firestore.collection("users").doc(user.uid);
 
-  // 1️⃣ Try to show cached Firestore data first (instant)
-  userRefFS.get({ source: "cache" }).then((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      updateUI(data);
-    }
+  // Try cached data first
+  userRefFS.get({ source: "cache" }).then(doc => {
+    if (doc.exists) updateUI(doc.data());
   });
 
-  // 2️⃣ Sync data in real-time from RTDB (when online)
-  userRefRTDB.on("value", (snapshot) => {
+  // Real-time updates
+  userRefRTDB.on("value", snapshot => {
     const data = snapshot.val();
     if (data) {
       updateUI(data);
-      // Update Firestore for offline cache
       userRefFS.set(data, { merge: true });
     }
   });
 
-  // 3️⃣ If no RTDB data yet, ensure Firestore has initial structure
+  // Ensure default structure
   const snapshot = await userRefRTDB.once("value");
   if (!snapshot.exists()) {
-    const defaultData = { coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" };
+    const defaultData = { coins: 0, todaysEarnings: 0, streak: 0, referralCode: user.uid.substring(0,6).toUpperCase() };
     userRefRTDB.set(defaultData);
     userRefFS.set(defaultData);
   }
 });
 
-// Function to update UI safely
+// Update UI
 function updateUI(data) {
-  totalCoinsDisplay.textContent = `${data.coins} Coins`;
-  totalRupeesDisplay.textContent = "₹ " + (data.coins * 0.01).toFixed(2);
-  todaysEarningsDisplay.textContent = data.todaysEarnings || 0;
-  currentStreakDisplay.textContent = data.streak || 0;
+  totalCoinsDisplay.textContent = `${data.coins || 0} Coins`;
+  totalRupeesDisplay.textContent = "₹ " + ((data.coins || 0) * 0.01).toFixed(2);
 }
+
+// Referral sharing
+document.getElementById("referNowBtn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please log in to share your referral link.");
+    return;
+  }
+
+  const userRef = db.ref("users/" + user.uid);
+  const snapshot = await userRef.once("value");
+  const userData = snapshot.val();
+  const referralCode = userData?.referralCode || user.uid.substring(0, 6).toUpperCase();
+
+  const shareText = `🎉 Use my referral code *${referralCode}* on Coin To Real Cash and earn bonus coins! 💰\n\nDownload now: https://coin-to-real-cash.web.app/`;
+
+  if (navigator.share) {
+    await navigator.share({ title: "Coin To Real Cash", text: shareText });
+  } else {
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, "_blank");
+  }
+});
 </script>
 </body>
 </html>

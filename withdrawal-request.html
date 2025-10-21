@@ -101,7 +101,7 @@ function renderRequests(data) {
 
 // ✅ Fetch Realtime Database data
 auth.onAuthStateChanged((user) => {
-  if (!user) return (window.location.href = "login.html");
+  if (!user) return (window.location.href = "index.html");
 
   const uid = user.uid;
   const userWithdrawalsRef = realtimeDB.ref(`withdrawals/${uid}`);
