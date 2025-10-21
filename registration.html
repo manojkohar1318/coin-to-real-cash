@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin To Real Cash - Register</title>
+    <link rel="stylesheet" href="assets/css/registration.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script>
+        (function(){
+            emailjs.init("1cGie4oBj2KOxJk8c"); // Your EmailJS public key
+        })();
+    </script>
+    <style>
+        .create-account-btn { text-decoration: none; }
+        .account-btn { margin: 30px 0px; }
+    </style>
+</head>
+<body>
+   <div class="header-banner">
+        <h1>Coin To Real Cash</h1>
+    </div>
+
+    <div class="container">
+        <h2>Create Account</h2>
+        <p class="subtitle">Fill details to continue</p>
+
+        <form id="registration-form">
+            <div class="input-group">
+                <input type="text" placeholder="Username" id="username" required>
+            </div>
+            <div class="input-group">
+                <input type="email" placeholder="Email" id="email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" placeholder="Password" id="password" required>
+            </div>
+            <div class="input-group">
+                <input type="password" placeholder="Confirm Password" id="confirm-password" required>
+            </div>
+            
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="showAllPasswordsToggle">
+                <label for="showAllPasswordsToggle">Show Passwords</label>
+            </div>
+
+            <div class="account-btn">
+                <button type="submit" class="create-account-btn">Create Account</button>
+            </div>
+        </form>
+
+        <p class="signin-link">Already have an account? <a href="index.html">Login here</a></p>
+    </div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+    storageBucket: "coin-to-real-cash.firebasestorage.app",
+    messagingSenderId: "265929655267",
+    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+  const firestore = firebase.firestore();
+
+  // Show/hide password
+  document.addEventListener('DOMContentLoaded', function() {
+      const passwordField = document.getElementById('password');
+      const confirmPasswordField = document.getElementById('confirm-password');
+      const showPasswordToggle = document.getElementById('showAllPasswordsToggle');
+
+      showPasswordToggle.addEventListener('change', function() {
+          const newType = showPasswordToggle.checked ? 'text' : 'password';
+          passwordField.type = newType;
+          confirmPasswordField.type = newType;
+      });
+  });
+
+  // Registration form submit
+    document.getElementById("registration-form").addEventListener("submit", function(e){
+        e.preventDefault();
+
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const confirmPassword = document.getElementById("confirm-password").value.trim();
+
+        // Validation (kept the same)
+        if (!email.endsWith("@gmail.com")) {
+            alert("Please enter a valid Gmail address.");
+            return;
+        }
+        if (password.length < 6) {
+            alert("Password must be at least 6 characters.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        // --- Core Fix Area: Ensure all operations run sequentially and log errors ---
+
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            
+            // 1. Array of promises for database writes
+            const dbWrites = [];
+
+            // Realtime Database Write
+            const realtimeDBWrite = db.ref("users/" + user.uid).set({
+                username: username,
+                email: email,
+                coins: 0,
+                createdAt: Date.now()
+            }).then(() => console.log("Realtime DB write successful!"))
+              .catch(err => {
+                  console.error("Realtime DB write error:", err);
+                  // Critical: Alert on failure to diagnose security rule issues
+                  alert("Realtime Database Write Failed: " + err.message);
+                  throw new Error("Realtime DB write failed after auth success.");
+              });
+            dbWrites.push(realtimeDBWrite);
+
+            // Firestore Write
+            const firestoreWrite = firestore.collection("users").doc(user.uid).set({
+                username: username,
+                email: email,
+                coins: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => console.log("Firestore write successful!"))
+              .catch(err => {
+                  console.error("Firestore write error:", err);
+                  // Critical: Alert on failure to diagnose security rule issues
+                  alert("Firestore Write Failed: " + err.message);
+                  throw new Error("Firestore write failed after auth success.");
+              });
+            dbWrites.push(firestoreWrite);
+            
+            // 2. Wait for all database writes to complete successfully
+            return Promise.all(dbWrites)
+                .then(() => {
+                    // Optional: send welcome email (kept the same)
+                    emailjs.send("service_dndq44b", "template_6im86kh", {
+                        user_name: username,
+                        email: email
+                    });
+
+                    alert("Registration successful! Data saved to both databases.");
+                    window.location.href = "index.html";
+                });
+        })
+        .catch((error) => {
+            // This catches Auth errors AND the re-thrown DB errors
+            console.error("Registration Process Error:", error);
+            alert("Registration Error: " + error.message);
+            
+            // If the database write failed but the user was created, you might want to 
+            // delete the user, but for now, we just report the error.
+        });
+    });
+</script>
+</body>
+</html>

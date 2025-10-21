@@ -69,13 +69,13 @@
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-  authDomain: "coin-to-real-cash.firebaseapp.com",
-  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-  projectId: "coin-to-real-cash",
-  storageBucket: "coin-to-real-cash.firebasestorage.app",
-  messagingSenderId: "265929655267",
-  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -84,92 +84,94 @@ const db = firebase.database();
 const firestore = firebase.firestore();
 
 document.addEventListener("DOMContentLoaded", () => {
-  const walletEl = document.getElementById("wallet-balance");
-  const rupeeEl = document.getElementById("winning-balance");
-  const upiForm = document.getElementById("upi-form");
-  const bankForm = document.getElementById("bank-form");
-  const upiMethod = document.getElementById("upi");
-  const bankMethod = document.getElementById("bank");
+  const walletEl = document.getElementById("wallet-balance");
+  const rupeeEl = document.getElementById("winning-balance");
+  const upiForm = document.getElementById("upi-form");
+  const bankForm = document.getElementById("bank-form");
+  const upiMethod = document.getElementById("upi");
+  const bankMethod = document.getElementById("bank");
 
-  // Toggle methods
-  upiMethod.onclick = () => {
-    upiForm.classList.remove("hidden");
-    bankForm.classList.add("hidden");
-    upiMethod.classList.add("active");
-    bankMethod.classList.remove("active");
-  };
-  bankMethod.onclick = () => {
-    bankForm.classList.remove("hidden");
-    upiForm.classList.add("hidden");
-    bankMethod.classList.add("active");
-    upiMethod.classList.remove("active");
-  };
+  // Toggle methods
+  upiMethod.onclick = () => {
+    upiForm.classList.remove("hidden");
+    bankForm.classList.add("hidden");
+    upiMethod.classList.add("active");
+    bankMethod.classList.remove("active");
+  };
+  bankMethod.onclick = () => {
+    bankForm.classList.remove("hidden");
+    upiForm.classList.add("hidden");
+    bankMethod.classList.add("active");
+    upiMethod.classList.remove("active");
+  };
 
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return (window.location.href = "login.html");
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return (window.location.href = "login.html");
 
-    const userRef = db.ref(`users/${user.uid}`);
-    const withdrawalRef = db.ref(`withdrawals/${user.uid}`);
+    const userRef = db.ref(`users/${user.uid}`);
+    const withdrawalRef = db.ref(`withdrawals/${user.uid}`);
 
-    const snap = await userRef.once("value");
-    if (!snap.exists()) {
-      await userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
-    }
+    const snap = await userRef.once("value");
+    if (!snap.exists()) {
+      await userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
+    }
 
-    userRef.on("value", (snapshot) => {
-      const data = snapshot.val() || {};
-      walletEl.textContent = data.coins || 0;
-      rupeeEl.textContent = `₹${((data.coins || 0) * 0.01).toFixed(2)}`;
-    });
+    userRef.on("value", (snapshot) => {
+      const data = snapshot.val() || {};
+      walletEl.textContent = data.coins || 0;
+      rupeeEl.textContent = `₹${((data.coins || 0) * 0.01).toFixed(2)}`;
+    });
 
-    async function submitWithdrawal(request, amountInRupees) {
-      const amountInCoins = amountInRupees * 100;
-      try {
-        const userSnapshot = await userRef.once("value");
-        const currentCoins = userSnapshot.val().coins || 0;
-        if (currentCoins < amountInCoins) return alert("Insufficient balance!");
+    async function submitWithdrawal(request, amountInRupees) {
+      const amountInCoins = amountInRupees * 100;
+      try {
+        const userSnapshot = await userRef.once("value");
+        const currentCoins = userSnapshot.val().coins || 0;
+        if (currentCoins < amountInCoins) return alert("Insufficient balance!");
 
-        const newRef = withdrawalRef.push();
-        await newRef.set(request);
+        // Save to Realtime Database
+        const newRef = withdrawalRef.push();
+        await newRef.set(request);
 
-        await firestore.collection("withdrawals")
-          .doc(user.uid)
-          .collection("requests")
-          .doc(newRef.key)
-          .set(request);
+        // Save to Firestore - FIXED: Use .add() to correctly create a new document
+        await firestore.collection("withdrawals")
+          .doc(user.uid)
+          .collection("requests")
+          .add(request); // Corrected method
 
-        await userRef.update({ coins: currentCoins - amountInCoins });
-        alert("Withdrawal request submitted successfully!");
-      } catch (err) {
-        console.error(err);
-        alert("Failed to submit request. Please try again.");
-      }
-    }
+        // Update user coins
+        await userRef.update({ coins: currentCoins - amountInCoins });
+        alert("Withdrawal request submitted successfully!");
+      } catch (err) {
+        console.error("Withdrawal Error:", err); // Better logging
+        alert("Failed to submit request. Please try again.");
+      }
+    }
 
-    upiForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const upiId = document.getElementById("upiId").value.trim();
-      const amount = parseFloat(document.getElementById("upiAmount").value);
-      if (!upiId || amount < 5) return alert("Enter valid UPI ID and minimum ₹5.");
-      const request = { method: "upi", details: { upiId }, amount, status: "Pending", timestamp: Date.now() };
-      await submitWithdrawal(request, amount);
-      upiForm.reset();
-    };
+    upiForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const upiId = document.getElementById("upiId").value.trim();
+      const amount = parseFloat(document.getElementById("upiAmount").value);
+      if (!upiId || amount < 5) return alert("Enter valid UPI ID and minimum ₹5.");
+      const request = { method: "upi", details: { upiId }, amount, status: "Pending", timestamp: Date.now() };
+      await submitWithdrawal(request, amount);
+      upiForm.reset();
+    };
 
-    bankForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const holderName = document.getElementById("holderName").value.trim();
-      const accountNumber = document.getElementById("accountNumber").value.trim();
-      const bankName = document.getElementById("bankName").value.trim();
-      const ifscCode = document.getElementById("ifscCode").value.trim();
-      const amount = parseFloat(document.getElementById("bankAmount").value);
-      if (!holderName || !accountNumber || !bankName || !ifscCode || amount < 5)
-        return alert("Please fill all details and enter minimum ₹5.");
-      const request = { method: "bank", details: { holderName, accountNumber, bankName, ifscCode }, amount, status: "Pending", timestamp: Date.now() };
-      await submitWithdrawal(request, amount);
-      bankForm.reset();
-    };
-  });
+    bankForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const holderName = document.getElementById("holderName").value.trim();
+      const accountNumber = document.getElementById("accountNumber").value.trim();
+      const bankName = document.getElementById("bankName").value.trim();
+      const ifscCode = document.getElementById("ifscCode").value.trim();
+      const amount = parseFloat(document.getElementById("bankAmount").value);
+      if (!holderName || !accountNumber || !bankName || !ifscCode || amount < 5)
+        return alert("Please fill all details and enter minimum ₹5.");
+      const request = { method: "bank", details: { holderName, accountNumber, bankName, ifscCode }, amount, status: "Pending", timestamp: Date.now() };
+      await submitWithdrawal(request, amount);
+      bankForm.reset();
+    };
+  });
 });
 </script>
 </body>

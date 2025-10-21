@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin To Real Cash - Enter Referral Code</title>
+<link rel="stylesheet" href="assets/css/referral-code.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+</head>
+<body>
+    <a href="invite.html" class="back-btn">&#8592; Back</a>
+<div class="container">
+  <h2>Enter Referral Code</h2>
+  <p>Get extra coins by entering a friend's referral code!</p>
+
+  <div class="input-group">
+    <input type="text" id="referralInput" placeholder="Enter referral code">
+    <button id="submitReferral">Submit</button>
+  </div>
+
+  <div class="message" id="referralMessage"></div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+const referralInput = document.getElementById("referralInput");
+const submitBtn = document.getElementById("submitReferral");
+const referralMessage = document.getElementById("referralMessage");
+
+auth.onAuthStateChanged(user => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  const userRef = db.ref("users/" + user.uid);
+
+  submitBtn.addEventListener("click", async () => {
+    const enteredCode = referralInput.value.trim();
+    if(!enteredCode){
+      referralMessage.style.color = "red";
+      referralMessage.textContent = "Please enter a referral code!";
+      return;
+    }
+
+    // Fetch current user data
+    const userSnapshot = await userRef.once("value");
+    const userData = userSnapshot.val();
+
+    // Prevent using own referral code
+    if(userData.referralCode == enteredCode){
+      referralMessage.style.color = "red";
+      referralMessage.textContent = "You cannot use your own referral code!";
+      return;
+    }
+
+    // Check if referral code exists
+    const allUsersSnapshot = await db.ref("users").once("value");
+    let referrerUid = null;
+    allUsersSnapshot.forEach(snap => {
+      const data = snap.val();
+      if(data.referralCode == enteredCode){
+        referrerUid = snap.key;
+      }
+    });
+
+    if(!referrerUid){
+      referralMessage.style.color = "red";
+      referralMessage.textContent = "Referral code not found!";
+      return;
+    }
+
+    // Update coins: X gets 250, Y gets 500
+    const updates = {};
+    updates[`users/${user.uid}/coins`] = (userData.coins || 0) + 250;
+
+    const referrerSnapshot = await db.ref("users/" + referrerUid).once("value");
+    const referrerData = referrerSnapshot.val();
+    updates[`users/${referrerUid}/coins`] = (referrerData.coins || 0) + 500;
+
+    // Mark that user has used referral code to prevent reuse
+    if(userData.hasUsedReferral){
+      referralMessage.style.color = "red";
+      referralMessage.textContent = "You have already used a referral code!";
+      return;
+    }
+    updates[`users/${user.uid}/hasUsedReferral`] = true;
+
+    await db.ref().update(updates);
+
+    referralMessage.style.color = "green";
+    referralMessage.textContent = `🎉 Congratulations! You got 250 coins referral bonus.`;
+    referralInput.value = "";
+  });
+});
+</script>
+</body>
+</html>
