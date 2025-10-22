@@ -1,0 +1,24 @@
+{
+  "name": "Coin To Real Cash",
+  "short_name": "CoinToCash",
+  "description": "Earn coins through activities and convert them to real cash",
+  "start_url": "/coin-to-real-cash/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e90ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/image/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/image/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
