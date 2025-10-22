@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   auth.onAuthStateChanged(user => {
     if(!user){
-      window.location.href = "login.html";
+      window.location.href = "index.html";
       return;
     }
 
@@ -55,31 +55,47 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } else {
         referralCode = generateReferralCode();
-        userRef.set({ coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "", referralCode: referralCode });
+        userRef.set({ coins: 0, lastDailyBonus: "", referralCode: referralCode });
         referralInput.value = referralCode;
       }
 
-      const message = `🎉 Hey! Check out Coin To Real Cash!\nGet started with my referral code: ${referralCode} and enjoy rewards instantly.\n📲 Download now: https://manojkohar1318.github.io/coin-to-real-cash/\nLet’s earn together! 💰`;
+      const message = `🎉 Hey! Check out Coin To Real Cash!\nGet started with my referral code: ${referralCode} and enjoy 250 coins rewards instantly.\n📲 Download now: https://manojkohar1318.github.io/coin-to-real-cash/\nLet’s earn together! 💰`;
 
       // Share button functionality
-      shareBtn.addEventListener("click", async () => {        
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: "Coin To Real Cash",
-              text: message,
-              url: "https://manojkohar1318.github.io/coin-to-real-cash/"
-            });
-          } catch (err) {
-            console.error("Share failed:", err.message);
-          }
-        } else {
-          referralInput.select();
-          referralInput.setSelectionRange(0, 99999);
-          document.execCommand("copy");
-          alert("Referral code copied! You can now paste it in any app to share.");
-        }
+shareBtn.addEventListener("click", async () => {
+  // 1. Prioritize the Web Share API for native mobile sharing
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Coin To Real Cash",
+        text: message,
+        url: "https://manojkohar1318.github.io/coin-to-real-cash/"
       });
+    } catch (err) {
+      // User cancelled share or other error. Do nothing or log it.
+      console.error("Share failed or was cancelled:", err.message);
+    }
+    return; // Exit if Web Share was attempted
+  }
+
+  // 2. Fallback for Desktop or devices that don't support navigator.share
+  // This triggers the browser's general share/copy prompt (what you see on your working device).
+  try {
+    // We attempt to copy the message to the clipboard first,
+    // which often works better than copying the input field content.
+    await navigator.clipboard.writeText(message);
+    
+    // Then show the alert that the full message has been copied
+    alert("Referral link and code copied! You can now paste it in any app to share.");
+
+  } catch (err) {
+    // Simple fallback copy if clipboard.writeText fails
+    referralInput.select();
+    referralInput.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Referral code copied! You can now paste it in any app to share.");
+  }
+});
 
       // Update social media links dynamically
       document.querySelector(".instagram").href = `https://www.instagram.com/?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodeURIComponent(message)}`;

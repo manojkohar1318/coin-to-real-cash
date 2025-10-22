@@ -32,6 +32,7 @@ body {
 .invite-subtitle {
     font-size: 0.9em;
     color: #666;
+    font-style: bold;
     margin-top: 0;
     margin-bottom: 25px;
 }
