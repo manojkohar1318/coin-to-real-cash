@@ -145,6 +145,7 @@ function updateUI(data) {
   totalRupeesDisplay.textContent = "₹ " + ((data.coins || 0) * 0.01).toFixed(2);
 }
 
+// Referral sharing
 document.getElementById("referNowBtn").addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) {
@@ -159,24 +160,13 @@ document.getElementById("referNowBtn").addEventListener("click", async () => {
 
   const shareText = `🎉 Use my referral code *${referralCode}* on Coin To Real Cash and earn bonus coins! 💰\n\nDownload now: https://coin-to-real-cash.web.app/`;
 
-  // ✅ Web Share API (real device + HTTPS)
   if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "Coin To Real Cash",
-        text: shareText,
-        url: "https://coin-to-real-cash.web.app/"
-      });
-    } catch (err) {
-      console.log("Share cancelled or failed:", err);
-    }
+    await navigator.share({ title: "Coin To Real Cash", text: shareText });
   } else {
-    // ✅ Android Intent fallback for full share chooser (local testing)
-    const intentUrl = `intent://share?text=${encodeURIComponent(shareText)}#Intent;action=android.intent.action.SEND;type=text/plain;end`;
-    window.location.href = intentUrl;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, "_blank");
   }
 });
-
 </script>
 </body>
 </html>
