@@ -90,9 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ✅ Updated Social Media Links
       const encodedMsg = encodeURIComponent(message);
-      document.querySelector(".instagram").href =
-        `https://www.instagram.com/?url=https://manojkohar1318.github.io/cointorealcash/&text=${encodedMsg}`;
-     document.querySelector(".telegram").href = `https://t.me/share/&text==${encodedMsg}`;
       // ✅ WhatsApp direct & fallback
       const whatsappLink = `intent://send?text=${encodedMsg}#Intent;package=com.whatsapp;scheme=whatsapp;end`;
       const whatsappWebFallback = `https://wa.me/?text=${encodedMsg}`;
@@ -141,8 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
 <div class="social-media-invite">
     <p>Invite by Social Media</p>
     <div class="social-icons">
-        <a class="social-icon instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a class="social-icon telegram" target="_blank"><i class="fab fa-telegram-plane"></i></a>
         <a class="social-icon whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
     </div>
 </div>
