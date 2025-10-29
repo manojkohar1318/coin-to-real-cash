@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const encodedMsg = encodeURIComponent(message);
       document.querySelector(".instagram").href =
         `https://www.instagram.com/?url=https://manojkohar1318.github.io/cointorealcash/&text=${encodedMsg}`;
-     document.querySelector(".telegram").href = `https://t.me/share/url?url=https%3A%2F%2Fhttps://manojkohar1318.github.io/cointorealcash/&text==${encodedMsg}`;
+     document.querySelector(".telegram").href = `https://t.me/share/text==${encodedMsg}`;
       // ✅ WhatsApp direct & fallback
       const whatsappLink = `intent://send?text=${encodedMsg}#Intent;package=com.whatsapp;scheme=whatsapp;end`;
       const whatsappWebFallback = `https://wa.me/?text=${encodedMsg}`;
