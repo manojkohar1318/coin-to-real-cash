@@ -72,17 +72,8 @@
     const db = firebase.database();
     const firestore = firebase.firestore();
 
-    // 🔁 Check if user is already logged in
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // If already logged in, go to home (or admin page if admin)
-        if (user.email === "cointorealcash@gmail.com") {
-          window.location.href = "admin-withdrawals.html";
-        } else {
-          window.location.href = "home.html";
-        }
-      }
-    });
+    // 🚫 Removed auto-redirect for logged-in users
+    // We only handle login manually below.
 
     // 🔐 Login form
     document.getElementById("login-form").addEventListener("submit", (e) => {
@@ -156,15 +147,16 @@
       }
     });
   </script>
+
   <script type="text/javascript">
-	atOptions = {
-		'key' : '5487226fbafb920264d71527d3f4a8aa',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/5487226fbafb920264d71527d3f4a8aa/invoke.js"></script>
+    atOptions = {
+      'key' : '5487226fbafb920264d71527d3f4a8aa',
+      'format' : 'iframe',
+      'height' : 60,
+      'width' : 468,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//www.highperformanceformat.com/5487226fbafb920264d71527d3f4a8aa/invoke.js"></script>
 </body>
 </html>
