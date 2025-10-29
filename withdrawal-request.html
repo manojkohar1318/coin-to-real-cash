@@ -42,7 +42,7 @@ const realtimeDB = firebase.database();
 const listEl = document.getElementById("withdrawal-list");
 const emptyEl = document.getElementById("empty");
 
-// ✅ Create a single withdrawal card
+// ✅ Create a single withdrawal card (fixed status class)
 function createWithdrawalCard(req) {
   const details =
     req.method === "upi"
@@ -51,11 +51,14 @@ function createWithdrawalCard(req) {
 
   const time = req.timestamp ? new Date(req.timestamp).toLocaleString() : "N/A";
 
-  // ✅ Change "Approved" → "Withdrawal Successful"
+  // Change "Approved" → "Withdrawal Successful" for display text
   let displayStatus = req.status || "Pending";
   if (displayStatus === "Approved") displayStatus = "Withdrawal Successful";
 
-  // ✅ Show remark or default message
+  // Create a class-safe status token (remove spaces)
+  const statusClass = (displayStatus || "Pending").replace(/\s+/g, "");
+
+  // Show remark or default message
   const noteMessage =
     req.remark && req.remark.trim() !== ""
       ? `<div class="note remark">Admin Remark: ${req.remark}</div>`
@@ -70,7 +73,7 @@ function createWithdrawalCard(req) {
       <div class="withdraw-card">
         <strong>${req.method?.toUpperCase() || "Unknown"} - ₹${req.amount || 0}</strong>
         <div class="details">${details}</div>
-        <div class="status ${req.status || "Pending"}">${displayStatus}</div>
+        <div class="status ${statusClass}">${displayStatus}</div>
         ${noteMessage}
         <small>${time}</small>
       </div>
