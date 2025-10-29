@@ -26,7 +26,7 @@ const db = firebase.database();
 
 // Function to generate unique 6-digit referral code
 function generateReferralCode() {
-  return Math.floor(100000 + Math.random() * 900000); // 6-digit number
+  return Math.floor(100000 + Math.random() * 900000);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,50 +61,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const message = `🎉 Hey! Check out Coin To Real Cash!\nGet started with my referral code: ${referralCode} and enjoy 250 coins rewards instantly.\n📲 Download now: https://manojkohar1318.github.io/coin-to-real-cash/\nLet’s earn together! 💰`;
 
-      // Share button functionality
-shareBtn.addEventListener("click", async () => {
-  // 1. Prioritize the Web Share API for native mobile sharing
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "Coin To Real Cash",
-        text: message,
-        url: "https://manojkohar1318.github.io/coin-to-real-cash/"
+      // ✅ Fixed Share Button (Opens all sharing apps)
+      shareBtn.addEventListener("click", async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Coin To Real Cash",
+              text: message,
+              url: "https://manojkohar1318.github.io/coin-to-real-cash/"
+            });
+            console.log("Share successful!");
+          } catch (err) {
+            console.error("Share failed:", err);
+          }
+        } else {
+          // Fallback (copy to clipboard)
+          try {
+            await navigator.clipboard.writeText(message);
+            alert("Referral message copied! Paste it into any app to share.");
+          } catch (err) {
+            referralInput.select();
+            referralInput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("Referral code copied! Paste it into any app to share.");
+          }
+        }
       });
-    } catch (err) {
-      // User cancelled share or other error. Do nothing or log it.
-      console.error("Share failed or was cancelled:", err.message);
-    }
-    return; // Exit if Web Share was attempted
-  }
 
-  // 2. Fallback for Desktop or devices that don't support navigator.share
-  // This triggers the browser's general share/copy prompt (what you see on your working device).
-  try {
-    // We attempt to copy the message to the clipboard first,
-    // which often works better than copying the input field content.
-    await navigator.clipboard.writeText(message);
-    
-    // Then show the alert that the full message has been copied
-    alert("Referral link and code copied! You can now paste it in any app to share.");
+      // ✅ Updated Social Media Links
+      const encodedMsg = encodeURIComponent(message);
+      document.querySelector(".instagram").href =
+        `https://www.instagram.com/?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodedMsg}`;
+      document.querySelector(".telegram").href =
+        `https://t.me/share/url?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodedMsg}`;
+      
+      // ✅ WhatsApp direct & fallback
+      const whatsappLink = `intent://send?text=${encodedMsg}#Intent;package=com.whatsapp;scheme=whatsapp;end`;
+      const whatsappWebFallback = `https://wa.me/?text=${encodedMsg}`;
+      const whatsappAnchor = document.querySelector(".whatsapp");
 
-  } catch (err) {
-    // Simple fallback copy if clipboard.writeText fails
-    referralInput.select();
-    referralInput.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("Referral code copied! You can now paste it in any app to share.");
-  }
-});
-
-      // Update social media links dynamically
-      document.querySelector(".instagram").href = `https://www.instagram.com/?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodeURIComponent(message)}`;
-      document.querySelector(".telegram").href = `https://t.me/share/url?url=https%3A%2F%2Fmanojkohar1318.github.io/coin-to-real-cash/&text=${encodeURIComponent(message)}`;
-      document.querySelector(".whatsapp").href = `https://wa.me/?&text=${encodeURIComponent(message)}`;
+      whatsappAnchor.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = whatsappLink;
+        setTimeout(() => {
+          window.location.href = whatsappWebFallback;
+        }, 1000);
+      });
     });
   });
 
-  // Copy to clipboard
+  // Copy button beside input
   const copyBtn = document.querySelector(".fa-copy");
   copyBtn.addEventListener("click", () => {
     referralInput.select();
@@ -114,7 +120,6 @@ shareBtn.addEventListener("click", async () => {
   });
 });
 </script>
-
 </head>
 <body>
 <div class="container invite-page-container">
