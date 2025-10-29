@@ -101,6 +101,7 @@ const firebaseConfig = {
     appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.database();
 
@@ -112,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.getElementById('logoutBtn');
 
     auth.onAuthStateChanged(user => {
-        if(!user){
+        if (!user) {
             window.location.href = "index.html"; // redirect if not logged in
             return;
         }
@@ -120,14 +121,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const userRef = db.ref("users/" + user.uid);
 
         userRef.once("value").then(snapshot => {
-            if(!snapshot.exists()){
-                userRef.set({ username: 'User', coins: 0, todaysEarnings: 0, streak: 0, lastDailyBonus: "" });
+            if (!snapshot.exists()) {
+                userRef.set({
+                    username: 'User',
+                    coins: 0,
+                    todaysEarnings: 0,
+                    streak: 0,
+                    lastDailyBonus: ""
+                });
             }
         });
 
         userRef.on("value", snapshot => {
             const data = snapshot.val();
-            if(data){
+            if (data) {
                 const username = data.username || 'User';
                 const userEmail = user.email || 'No Email';
 
@@ -135,18 +142,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 usernameDisplay.textContent = username;
                 emailDisplay.textContent = userEmail;
 
-                supportBtn.addEventListener('click', function(e) {
+                // ✅ Corrected support button email logic
+                supportBtn.onclick = function(e) {
                     e.preventDefault();
-                    const subject = "Feedback";
-                    const body = `Hello Manoj,%0A%0AI am ${encodeURIComponent(username)}.%0AI want to share my feedback:%0A`;
+                    const subject = encodeURIComponent("Feedback");
+                    const body = encodeURIComponent(
+                        `Hello Manoj,\n\nI am ${username}.\nI want to share my feedback:\n`
+                    );
                     window.location.href = `mailto:cointorealcash@gmail.com?subject=${subject}&body=${body}`;
-                });
+                };
             }
         });
     });
 
-    // Logout
-    logoutBtn.addEventListener('click', function(e){
+    // ✅ Logout
+    logoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
         auth.signOut().then(() => {
             window.location.href = "index.html";
@@ -154,5 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
 </body>
 </html>
