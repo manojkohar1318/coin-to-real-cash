@@ -94,7 +94,7 @@ header h2 {
   background: rgba(255, 193, 7, 0.15);
 }
 
-.status.Approved {
+.status.WithdrawalSuccessful {
   color: #28a745;
   background: rgba(40, 167, 69, 0.15);
 }
