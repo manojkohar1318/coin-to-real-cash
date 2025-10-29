@@ -256,26 +256,45 @@
       console.log("✅ Users loaded:", usersData);
     });
 
-    // ✅ Render Request
-    function renderRequest(uid, reqId, data) {
-      const li = document.createElement("li");
-      li.classList.add("request-item");
-      const username = usersData[uid]?.username || "Unknown User";
-      const statusClass = data.status.replace(/\s/g, '');
+   // ✅ Render Request
+function renderRequest(uid, reqId, data) {
+  const li = document.createElement("li");
+  li.classList.add("request-item");
 
-      li.innerHTML = `
-        <div class="request-info">
-          <p><strong>User:</strong> ${username}</p>
-          <p><strong>Amount:</strong> ₹${data.amount}</p>
-          <p><strong>Method:</strong> ${data.method}</p>
-          ${data.method === "upi"
-            ? `<p><strong>UPI ID:</strong> ${data.details?.upiId || "N/A"}</p>`
-            : `<p><strong>Account No:</strong> ${data.details?.accountNumber || "N/A"}<br>
-              <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`}
-          <p><strong>Status:</strong> <span class="status ${statusClass}">${data.status}</span></p>
-          ${data.remark ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>` : ""}
-        </div>
-      `;
+  // Temporary placeholder until username loads
+  li.innerHTML = `
+    <div class="request-info">
+      <p><strong>User:</strong> Loading...</p>
+      <p><strong>Amount:</strong> ₹${data.amount}</p>
+      <p><strong>Method:</strong> ${data.method}</p>
+      ${
+        data.method === "upi"
+          ? `<p><strong>UPI ID:</strong> ${data.details?.upiId || "N/A"}</p>`
+          : `<p><strong>Account No:</strong> ${data.details?.accountNumber || "N/A"}<br>
+              <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`
+      }
+      <p><strong>Status:</strong> <span class="status ${data.status.replace(/\s/g, '')}">
+        ${data.status}
+      </span></p>
+      ${
+        data.remark
+          ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>`
+          : ""
+      }
+    </div>
+  `;
+
+  // ✅ Fetch username from Firebase Realtime Database
+  const userRef = firebase.database().ref(`users/${uid}/username`);
+  userRef.once("value")
+    .then((snapshot) => {
+      const username = snapshot.val() || "Unknown User";
+      const userEl = li.querySelector(".request-info p strong");
+      if (userEl) userEl.parentElement.innerHTML = `<strong>User:</strong> ${username}`;
+    })
+    .catch((error) => {
+      console.error("Error fetching username:", error);
+    });
 
       if (data.status === "Pending") {
         const controlsContainer = document.createElement("div");
