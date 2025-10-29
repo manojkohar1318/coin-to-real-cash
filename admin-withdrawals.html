@@ -4,13 +4,160 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin - Withdrawal Requests</title>
-  <link rel="stylesheet" href="assets/css/admin-withdrawals.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f9fbff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .admin-actions button {
+      background: white;
+      color: #007bff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .admin-actions button:hover {
+      background: #0056b3;
+      color: white;
+    }
+
+    .columns {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 300px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+    }
+
+    .column h2 {
+      text-align: center;
+      color: #007bff;
+      font-size: 18px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .request-item {
+      border: 2px solid #eee;
+      border-left: 5px solid orange;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background-color: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .request-item:hover {
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .request-info p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background-color: #f2f2f2;
+      display: inline-block;
+    }
+
+    .status.Pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status.Rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .status.WithdrawalSuccessful {
+      background-color: #d4edda;
+      color: #10b981;
+    }
+
+    .remark-input {
+      width: 100%;
+      height: 50px;
+      margin: 6px 0;
+      padding: 6px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .approve-btn,
+    .reject-btn {
+      flex: 1;
+      padding: 6px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .approve-btn {
+      background-color: #28a745;
+    }
+
+    .reject-btn {
+      background-color: #dc3545;
+    }
+  </style>
 </head>
 
 <body>
@@ -44,241 +191,162 @@
       </div>
     </div>
   </div>
-<script>
-  // 🔥 Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-    authDomain: "coin-to-real-cash.firebaseapp.com",
-    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-    projectId: "coin-to-real-cash",
-  };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const auth = firebase.auth();
+  <script>
+    // 🔥 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+      authDomain: "coin-to-real-cash.firebaseapp.com",
+      databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+      projectId: "coin-to-real-cash"
+    };
 
-  // Elements
-  const pendingList = document.getElementById("pending-list");
-  const approvedList = document.getElementById("approved-list");
-  const rejectedList = document.getElementById("rejected-list");
-  const changePassBtn = document.getElementById("changePassBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
 
-  // ✅ CHANGE PASSWORD (Sends reset email)
-  changePassBtn.addEventListener("click", () => {
-    const adminEmail = "cointorealcash@gmail.com";
-    auth
-      .sendPasswordResetEmail(adminEmail)
-      .then(() => {
-        alert(`A password reset link has been sent to ${adminEmail}. Please check your inbox.`);
-      })
-      .catch((error) => {
-        console.error("Error sending reset email:", error);
-        alert("Failed to send reset link. Make sure the admin email is correct or logged in.");
-      });
-  });
+    // Elements
+    const pendingList = document.getElementById("pending-list");
+    const approvedList = document.getElementById("approved-list");
+    const rejectedList = document.getElementById("rejected-list");
 
-  // ✅ LOGOUT FUNCTION
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut().then(() => {
-      window.location.href = "index.html";
+    // ✅ Logout Functionality
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      auth.signOut()
+        .then(() => {
+          alert("Logged out successfully!");
+          window.location.href = "index.html"; // redirect to login page
+        })
+        .catch((error) => {
+          console.error("Logout Error:", error);
+          alert("Error logging out. Check console.");
+        });
     });
-  });
 
-  // ✅ Render withdrawal request
-  function renderRequest(uid, username, reqId, data) {
-    const li = document.createElement("li");
-    li.classList.add("request-item");
+    // ✅ Change Password Functionality
+    document.getElementById("changePassBtn").addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("No admin logged in!");
+        return;
+      }
 
-    li.innerHTML = `
-      <div class="request-info">
-        <p><strong>Username:</strong> ${username || "Unknown User"}</p>
-        <p><strong>Amount:</strong> ₹${data.amount}</p>
-        <p><strong>Method:</strong> ${data.method}</p>
-        ${
-          data.method === "upi"
+      const oldPassword = prompt("Enter your current password:");
+      const newPassword = prompt("Enter your new password (min 6 chars):");
+      if (!oldPassword || !newPassword) return;
+
+      const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPassword);
+      user.reauthenticateWithCredential(cred)
+        .then(() => {
+          return user.updatePassword(newPassword);
+        })
+        .then(() => {
+          alert("Password changed successfully!");
+        })
+        .catch((error) => {
+          console.error("Password Change Error:", error);
+          alert("Error changing password. Please check the old password or try again.");
+        });
+    });
+
+    // 🧩 Load Users
+    let usersData = {};
+    db.ref("users").once("value").then(snapshot => {
+      usersData = snapshot.val() || {};
+      console.log("✅ Users loaded:", usersData);
+    });
+
+    // ✅ Render Request
+    function renderRequest(uid, reqId, data) {
+      const li = document.createElement("li");
+      li.classList.add("request-item");
+      const username = usersData[uid]?.username || "Unknown User";
+      const statusClass = data.status.replace(/\s/g, '');
+
+      li.innerHTML = `
+        <div class="request-info">
+          <p><strong>User:</strong> ${username}</p>
+          <p><strong>Amount:</strong> ₹${data.amount}</p>
+          <p><strong>Method:</strong> ${data.method}</p>
+          ${data.method === "upi"
             ? `<p><strong>UPI ID:</strong> ${data.details?.upiId || "N/A"}</p>`
             : `<p><strong>Account No:</strong> ${data.details?.accountNumber || "N/A"}<br>
-               <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`
-        }
-        <h5><strong>Status:</strong> 
-          <span class="status ${data.status.replace(/\s/g, "")}">${data.status}</span>
-        </h5>
-        ${
-          data.remark
-            ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>`
-            : ""
-        }
-      </div>
-    `;
+              <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`}
+          <p><strong>Status:</strong> <span class="status ${statusClass}">${data.status}</span></p>
+          ${data.remark ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>` : ""}
+        </div>
+      `;
 
-    if (data.status === "Pending") {
-      const btnContainer = document.createElement("div");
-      btnContainer.classList.add("actions");
-
-      const remarkInput = document.createElement("textarea");
-      remarkInput.placeholder = "Add remark message...";
-      remarkInput.classList.add("remark-input");
-
-      const approveBtn = document.createElement("button");
-      approveBtn.textContent = "Approve";
-      approveBtn.classList.add("approve-btn");
-      approveBtn.onclick = () =>
-        updateStatus(uid, username, reqId, "Withdrawal Successful", remarkInput.value);
-
-      const rejectBtn = document.createElement("button");
-      rejectBtn.textContent = "Reject";
-      rejectBtn.classList.add("reject-btn");
-      rejectBtn.onclick = () => {
-        const remark = remarkInput.value.trim();
-        if (!remark) {
-          alert("Please add a remark before rejecting.");
-          return;
-        }
-        updateStatus(uid, username, reqId, "Rejected", remark);
-      };
-
-      btnContainer.appendChild(remarkInput);
-      btnContainer.appendChild(approveBtn);
-      btnContainer.appendChild(rejectBtn);
-      li.appendChild(btnContainer);
-    }
-
-    return li;
-  }
-
-  // ✅ Update status and refund logic (fixed: rupees -> coins conversion)
-  async function updateStatus(uid, username, reqId, newStatus, remark = "") {
-    const ref = db.ref(`withdrawals/${uid}/${reqId}`);
-    const snapshot = await ref.once("value");
-    const data = snapshot.val();
-
-    if (!data) {
-      alert("Request not found.");
-      return;
-    }
-
-    await ref.update({
-      status: newStatus,
-      remark: remark || null,
-    });
-
-    // 💰 Refund if rejected (convert rupees -> coins using 100 coins = ₹1)
-    if (newStatus === "Rejected") {
-      try {
-        const userRef = db.ref(`users/${uid}`);
-        const userSnap = await userRef.once("value");
-        const userData = userSnap.val();
-
-        if (userData) {
-          // parse amount as rupees (allow decimals), then convert to coins
-          const rupees = parseFloat(String(data.amount || "0")) || 0;
-          const refundCoins = Math.round(rupees * 100); // 100 coins = ₹1
-
-          const currentCoins = parseInt(userData.coins || 0, 10) || 0;
-          const newBalance = currentCoins + refundCoins;
-
-          await userRef.update({ coins: newBalance });
-
-          alert(
-            `Request rejected. ₹${rupees.toFixed(2)} converted to ${refundCoins} coins and refunded to ${username}'s account.`
-          );
-        } else {
-          console.error("User not found for refund.");
-          alert("User not found — refund not completed.");
-        }
-      } catch (err) {
-        console.error("Refund failed:", err);
-        alert("Error refunding coins. Check console for details.");
-      }
-    } else {
-      alert(`Request marked as ${newStatus}`);
-    }
-  }
-
-  // ✅ Save data locally for offline use
-  function saveOfflineData(data) {
-    localStorage.setItem("withdrawalCache", JSON.stringify(data));
-  }
-
-  // ✅ Load cached data when offline
-  function loadOfflineData() {
-    const cached = localStorage.getItem("withdrawalCache");
-    if (cached) {
-      const { allRequests } = JSON.parse(cached);
-      renderAllRequests(allRequests);
-    } else {
-      pendingList.innerHTML =
-        "<li>No cached data available. Please connect to the internet.</li>";
-    }
-  }
-
-  // ✅ Render requests into 3 columns
-  function renderAllRequests(allRequests) {
-    pendingList.innerHTML = "";
-    approvedList.innerHTML = "";
-    rejectedList.innerHTML = "";
-
-    allRequests.sort((a, b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
-
-    allRequests.forEach(({ uid, username, reqId, data }) => {
-      const item = renderRequest(uid, username, reqId, data);
       if (data.status === "Pending") {
-        pendingList.appendChild(item);
-      } else if (data.status === "Withdrawal Successful") {
-        approvedList.appendChild(item);
-      } else if (data.status === "Rejected") {
-        rejectedList.appendChild(item);
+        const controlsContainer = document.createElement("div");
+        const remarkInput = document.createElement("textarea");
+        remarkInput.id = `remark-${reqId}`;
+        remarkInput.placeholder = "Enter remark message (e.g., Transaction ID, reason for rejection)";
+        remarkInput.classList.add("remark-input");
+
+        const btnContainer = document.createElement("div");
+        btnContainer.classList.add("actions");
+
+        const approveBtn = document.createElement("button");
+        approveBtn.textContent = "Approve";
+        approveBtn.classList.add("approve-btn");
+        approveBtn.onclick = () => {
+          const remark = remarkInput.value;
+          if (confirm("Approve this request?")) updateStatus(uid, reqId, "Withdrawal Successful", remark);
+        };
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.textContent = "Reject";
+        rejectBtn.classList.add("reject-btn");
+        rejectBtn.onclick = () => {
+          const remark = remarkInput.value;
+          if (!remark) {
+            alert("Please enter a remark before rejecting.");
+            return;
+          }
+          if (confirm("Reject this request?")) updateStatus(uid, reqId, "Rejected", remark);
+        };
+
+        btnContainer.appendChild(approveBtn);
+        btnContainer.appendChild(rejectBtn);
+        controlsContainer.appendChild(remarkInput);
+        controlsContainer.appendChild(btnContainer);
+        li.appendChild(controlsContainer);
       }
-    });
-  }
 
-  // ✅ Load data (online + cache)
-  async function loadWithdrawalRequests() {
-    try {
-      const usersSnap = await db.ref("users").once("value");
-      const users = usersSnap.val() || {};
+      return li;
+    }
 
-      db.ref("withdrawals").on("value", (snapshot) => {
-        const allRequests = [];
+    // ✅ Update Status
+    function updateStatus(uid, reqId, newStatus, remark = "") {
+      const ref = db.ref(`withdrawals/${uid}/${reqId}`);
+      const finalRemark = remark.trim() === "" ? null : remark.trim();
+      ref.update({
+        status: newStatus,
+        remark: finalRemark
+      }).then(() => {
+        alert(`Status updated to ${newStatus}`);
+      }).catch(err => console.error("Update failed:", err));
+    }
 
-        snapshot.forEach((userSnap) => {
-          const uid = userSnap.key;
-          const username = users[uid]?.username || "Unknown";
-          userSnap.forEach((reqSnap) => {
-            allRequests.push({
-              uid,
-              username,
-              reqId: reqSnap.key,
-              data: reqSnap.val(),
-            });
-          });
+    // ✅ Listen to All Withdrawals
+    db.ref("withdrawals").on("value", (snapshot) => {
+      pendingList.innerHTML = "";
+      approvedList.innerHTML = "";
+      rejectedList.innerHTML = "";
+
+      snapshot.forEach((userSnap) => {
+        const uid = userSnap.key;
+        userSnap.forEach((reqSnap) => {
+          const reqId = reqSnap.key;
+          const data = reqSnap.val();
+          const item = renderRequest(uid, reqId, data);
+          if (data.status === "Pending") pendingList.appendChild(item);
+          else if (data.status === "Withdrawal Successful") approvedList.appendChild(item);
+          else if (data.status === "Rejected") rejectedList.appendChild(item);
         });
-
-        renderAllRequests(allRequests);
-        saveOfflineData({ allRequests });
       });
-    } catch (err) {
-      console.error("Error loading data:", err);
-      loadOfflineData(); // fallback to cached data if Firebase fails
-    }
-  }
-
-  // ✅ Check if online or offline
-  window.addEventListener("load", () => {
-    if (navigator.onLine) {
-      loadWithdrawalRequests();
-    } else {
-      console.warn("Offline mode: showing cached data");
-      loadOfflineData();
-    }
-  });
-
-  // When internet comes back, reload fresh data
-  window.addEventListener("online", () => {
-    loadWithdrawalRequests();
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
