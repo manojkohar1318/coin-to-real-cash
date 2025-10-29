@@ -192,238 +192,161 @@
     </div>
   </div>
 
- <script>
-    // 🔥 Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-      authDomain: "coin-to-real-cash.firebaseapp.com",
-      databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-      projectId: "coin-to-real-cash"
-    };
+  <script>
+    // 🔥 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+      authDomain: "coin-to-real-cash.firebaseapp.com",
+      databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+      projectId: "coin-to-real-cash"
+    };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
 
-    // Global Data Store
-    let usersData = {};
-    
-    // Elements
-    const pendingList = document.getElementById("pending-list");
-    const approvedList = document.getElementById("approved-list");
-    const rejectedList = document.getElementById("rejected-list");
-    
-    // Custom Modal elements
-    const customModal = document.getElementById("custom-modal");
-    const modalMessage = document.getElementById("modal-message");
-    const modalOkBtn = document.getElementById("modal-ok-btn");
-    const modalCancelBtn = document.getElementById("modal-cancel-btn");
+    // Elements
+    const pendingList = document.getElementById("pending-list");
+    const approvedList = document.getElementById("approved-list");
+    const rejectedList = document.getElementById("rejected-list");
 
-    /**
-     * Replacement for alert().
-     */
-    function showCustomAlert(message) {
-        modalMessage.textContent = message;
-        modalCancelBtn.style.display = 'none';
-        modalOkBtn.onclick = () => customModal.style.display = 'none';
-        customModal.style.display = 'block';
-    }
-    
-    /**
-     * Replacement for confirm().
-     */
-    function showCustomConfirm(message, onConfirm) {
-        modalMessage.textContent = message;
-        modalCancelBtn.style.display = 'inline-block';
-        
-        modalOkBtn.onclick = () => {
-            customModal.style.display = 'none';
-            onConfirm(true);
-        };
-        
-        modalCancelBtn.onclick = () => {
-            customModal.style.display = 'none';
-            onConfirm(false);
-        };
-        customModal.style.display = 'block';
-    }
-
-    // ✅ Logout Functionality
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      auth.signOut()
-        .then(() => {
-          showCustomAlert("Logged out successfully!");
-          // window.location.href = "index.html"; // Redirect to login page - uncomment if needed
-        })
-        .catch((error) => {
-          console.error("Logout Error:", error);
-          showCustomAlert("Error logging out. Check console.");
-        });
-    });
-
-    // ✅ Change Password Functionality
-    document.getElementById("changePassBtn").addEventListener("click", () => {
-      const user = auth.currentUser;
-      if (!user) {
-        showCustomAlert("No admin logged in!");
-        return;
-      }
-
-      // Since prompt() is also blocked in some environments, we'll use a placeholder for now
-      // and log the need for a better UI.
-      console.log("Password change initiated. A proper UI modal is required here.");
-      showCustomAlert("Password change requires input fields. Check the console for next steps.");
-      /* // Replace with a proper modal UI for old/new password input
-      const oldPassword = prompt("Enter your current password:");
-      const newPassword = prompt("Enter your new password (min 6 chars):");
-      if (!oldPassword || !newPassword) return;
-
-      const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPassword);
-      user.reauthenticateWithCredential(cred)
-        .then(() => {
-          return user.updatePassword(newPassword);
-        })
-        .then(() => {
-          showCustomAlert("Password changed successfully!");
-        })
-        .catch((error) => {
-          console.error("Password Change Error:", error);
-          showCustomAlert("Error changing password. Check console.");
-        });
-      */
-    });
-
-
-    // ✅ Render Request
-    function renderRequest(uid, reqId, data) {
-      const li = document.createElement("li");
-      li.classList.add("request-item");
-      // Use the globally loaded usersData
-      const username = usersData[uid]?.username || "Unknown User";
-      const statusClass = data.status.replace(/\s/g, '');
-
-      li.innerHTML = `
-        <div class="request-info">
-          <p><strong>User ID:</strong> ${uid}</p>
-          <p><strong>User:</strong> ${username}</p>
-          <p><strong>Amount:</strong> ₹${data.amount}</p>
-          <p><strong>Method:</strong> ${data.method}</p>
-          ${data.method === "upi"
-            ? `<p><strong>UPI ID:</strong> ${data.details?.upiId || "N/A"}</p>`
-            : `<p><strong>Account No:</strong> ${data.details?.accountNumber || "N/A"}<br>
-              <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`}
-          <p><strong>Status:</strong> <span class="status ${statusClass}">${data.status}</span></p>
-          ${data.remark ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>` : ""}
-        </div>
-      `;
-
-      if (data.status === "Pending") {
-        const controlsContainer = document.createElement("div");
-        const remarkInput = document.createElement("textarea");
-        remarkInput.id = `remark-${reqId}`;
-        remarkInput.placeholder = "Enter remark message (e.g., Transaction ID, reason for rejection)";
-        remarkInput.classList.add("remark-input");
-
-        const btnContainer = document.createElement("div");
-        btnContainer.classList.add("actions");
-
-        const approveBtn = document.createElement("button");
-        approveBtn.textContent = "Approve";
-        approveBtn.classList.add("approve-btn");
-        approveBtn.onclick = () => {
-          const remark = remarkInput.value;
-          showCustomConfirm("Approve this request?", (confirmed) => {
-            if (confirmed) {
-              updateStatus(uid, reqId, "Withdrawal Successful", remark);
-            }
-          });
-        };
-
-        const rejectBtn = document.createElement("button");
-        rejectBtn.textContent = "Reject";
-        rejectBtn.classList.add("reject-btn");
-        rejectBtn.onclick = () => {
-          const remark = remarkInput.value;
-          if (!remark.trim()) {
-            showCustomAlert("Please enter a remark before rejecting.");
-            return;
-          }
-          showCustomConfirm("Reject this request?", (confirmed) => {
-            if (confirmed) {
-              updateStatus(uid, reqId, "Rejected", remark);
-            }
-          });
-        };
-
-        btnContainer.appendChild(approveBtn);
-        btnContainer.appendChild(rejectBtn);
-        controlsContainer.appendChild(remarkInput);
-        controlsContainer.appendChild(btnContainer);
-        li.appendChild(controlsContainer);
-      }
-
-      return li;
-    }
-
-    // ✅ Update Status
-    function updateStatus(uid, reqId, newStatus, remark = "") {
-      const ref = db.ref(`withdrawals/${uid}/${reqId}`);
-      const finalRemark = remark.trim() === "" ? null : remark.trim();
-      ref.update({
-        status: newStatus,
-        remark: finalRemark
-      }).then(() => {
-        showCustomAlert(`Status updated to ${newStatus}`);
-      }).catch(err => {
-        console.error("Update failed:", err);
-        showCustomAlert("Update failed! Check console for errors (e.g., security rules).");
-      });
-    }
-    
-    // 🚀 Main function to ensure data loading order
-    async function loadDataAndStartListeners() {
-        try {
-            // 1. Load All Users Data FIRST
-            const usersSnapshot = await db.ref("users").once("value");
-            usersData = usersSnapshot.val() || {};
-            console.log("✅ Users data loaded successfully.");
-            
-            // 2. Start Withdrawal Listener AFTER usersData is ready
-            db.ref("withdrawals").on("value", (snapshot) => {
-                pendingList.innerHTML = "";
-                approvedList.innerHTML = "";
-                rejectedList.innerHTML = "";
-
-                snapshot.forEach((userSnap) => {
-                    const uid = userSnap.key;
-                    userSnap.forEach((reqSnap) => {
-                        const reqId = reqSnap.key;
-                        const data = reqSnap.val();
-                        const item = renderRequest(uid, reqId, data);
-                        if (data.status === "Pending") pendingList.appendChild(item);
-                        else if (data.status === "Withdrawal Successful") approvedList.appendChild(item);
-                        else if (data.status === "Rejected") rejectedList.appendChild(item);
-                    });
-                });
-            });
-            console.log("✅ Withdrawal listener started.");
-
-        } catch (error) {
-            console.error("Fatal initialization error:", error);
-            showCustomAlert("Error loading initial data. Check console for details.");
-        }
-    }
-
-    // Call the main function to start the app logic
-    loadDataAndStartListeners();
-    
-    // Add an event listener to close the modal when clicking outside
-    customModal.addEventListener('click', function(e) {
-        if (e.target === customModal) {
-            customModal.style.display = 'none';
-        }
+    // ✅ Logout Functionality
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      auth.signOut()
+        .then(() => {
+          alert("Logged out successfully!");
+          window.location.href = "index.html"; // redirect to login page
+        })
+        .catch((error) => {
+          console.error("Logout Error:", error);
+          alert("Error logging out. Check console.");
+        });
     });
 
-  </script>
+    // ✅ Change Password Functionality
+    document.getElementById("changePassBtn").addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("No admin logged in!");
+        return;
+      }
+
+      const oldPassword = prompt("Enter your current password:");
+      const newPassword = prompt("Enter your new password (min 6 chars):");
+      if (!oldPassword || !newPassword) return;
+
+      const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPassword);
+      user.reauthenticateWithCredential(cred)
+        .then(() => {
+          return user.updatePassword(newPassword);
+        })
+        .then(() => {
+          alert("Password changed successfully!");
+        })
+        .catch((error) => {
+          console.error("Password Change Error:", error);
+          alert("Error changing password. Please check the old password or try again.");
+        });
+    });
+
+    // 🧩 Load Users
+    let usersData = {};
+    db.ref("users").once("value").then(snapshot => {
+      usersData = snapshot.val() || {};
+      console.log("✅ Users loaded:", usersData);
+    });
+
+    // ✅ Render Request
+    function renderRequest(uid, reqId, data) {
+      const li = document.createElement("li");
+      li.classList.add("request-item");
+      const username = usersData[uid]?.username || "Unknown User";
+      const statusClass = data.status.replace(/\s/g, '');
+
+      li.innerHTML = `
+        <div class="request-info">
+          <p><strong>User:</strong> ${username}</p>
+          <p><strong>Amount:</strong> ₹${data.amount}</p>
+          <p><strong>Method:</strong> ${data.method}</p>
+          ${data.method === "upi"
+            ? `<p><strong>UPI ID:</strong> ${data.details?.upiId || "N/A"}</p>`
+            : `<p><strong>Account No:</strong> ${data.details?.accountNumber || "N/A"}<br>
+              <strong>IFSC:</strong> ${data.details?.ifscCode || "N/A"}</p>`}
+          <p><strong>Status:</strong> <span class="status ${statusClass}">${data.status}</span></p>
+          ${data.remark ? `<p class="remark-display"><strong>Remark:</strong> ${data.remark}</p>` : ""}
+        </div>
+      `;
+
+      if (data.status === "Pending") {
+        const controlsContainer = document.createElement("div");
+        const remarkInput = document.createElement("textarea");
+        remarkInput.id = `remark-${reqId}`;
+        remarkInput.placeholder = "Enter remark message (e.g., Transaction ID, reason for rejection)";
+        remarkInput.classList.add("remark-input");
+
+        const btnContainer = document.createElement("div");
+        btnContainer.classList.add("actions");
+
+        const approveBtn = document.createElement("button");
+        approveBtn.textContent = "Approve";
+        approveBtn.classList.add("approve-btn");
+        approveBtn.onclick = () => {
+          const remark = remarkInput.value;
+          if (confirm("Approve this request?")) updateStatus(uid, reqId, "Withdrawal Successful", remark);
+        };
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.textContent = "Reject";
+        rejectBtn.classList.add("reject-btn");
+        rejectBtn.onclick = () => {
+          const remark = remarkInput.value;
+          if (!remark) {
+            alert("Please enter a remark before rejecting.");
+            return;
+          }
+          if (confirm("Reject this request?")) updateStatus(uid, reqId, "Rejected", remark);
+        };
+
+        btnContainer.appendChild(approveBtn);
+        btnContainer.appendChild(rejectBtn);
+        controlsContainer.appendChild(remarkInput);
+        controlsContainer.appendChild(btnContainer);
+        li.appendChild(controlsContainer);
+      }
+
+      return li;
+    }
+
+    // ✅ Update Status
+    function updateStatus(uid, reqId, newStatus, remark = "") {
+      const ref = db.ref(`withdrawals/${uid}/${reqId}`);
+      const finalRemark = remark.trim() === "" ? null : remark.trim();
+      ref.update({
+        status: newStatus,
+        remark: finalRemark
+      }).then(() => {
+        alert(`Status updated to ${newStatus}`);
+      }).catch(err => console.error("Update failed:", err));
+    }
+
+    // ✅ Listen to All Withdrawals
+    db.ref("withdrawals").on("value", (snapshot) => {
+      pendingList.innerHTML = "";
+      approvedList.innerHTML = "";
+      rejectedList.innerHTML = "";
+
+      snapshot.forEach((userSnap) => {
+        const uid = userSnap.key;
+        userSnap.forEach((reqSnap) => {
+          const reqId = reqSnap.key;
+          const data = reqSnap.val();
+          const item = renderRequest(uid, reqId, data);
+          if (data.status === "Pending") pendingList.appendChild(item);
+          else if (data.status === "Withdrawal Successful") approvedList.appendChild(item);
+          else if (data.status === "Rejected") rejectedList.appendChild(item);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
