@@ -6,84 +6,38 @@
   <title>Interactive Scratch Card</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* ---------- BACK BUTTON ---------- */
     .back-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      color: #333;
-      font-weight: 600;
-      font-size: 1.2em;
-      padding: 8px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-      z-index: 200;
+      position: fixed; top: 20px; left: 20px;
+      background: rgba(255,255,255,0.9); color:#333;
+      font-weight:600; font-size:1.2em; padding:8px 16px;
+      border-radius:8px; text-decoration:none;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      transition:all 0.3s ease; z-index:200;
     }
-    .back-btn:hover {
-      background: #1e90ff;
-      color: #fff;
-      transform: scale(1.05);
-    }
-
-    #scratch-card-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      touch-action: none;
-    }
-    #scratch-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      cursor: pointer;
-      z-index: 10;
-      background-color: #2b6cb0;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><circle fill="%23255a95" cx="2" cy="2" r="1.5"/></svg>');
-      background-repeat: repeat;
-    }
-    #prize-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background-color: #fff;
-      color: #1a202c;
-      transition: opacity 1s ease-in-out;
-      z-index: 1;
-    }
+    .back-btn:hover { background:#1e90ff; color:#fff; transform:scale(1.05);}
+    #scratch-card-container { position:relative; width:300px; height:300px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.2); border-radius:1.5rem;
+      overflow:hidden; touch-action:none;}
+    #scratch-layer { position:absolute; top:0; left:0; cursor:pointer;
+      z-index:10; background-color:#2b6cb0;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><circle fill="%23255a95" cx="2" cy="2" r="1.5"/></svg>');
+      background-repeat:repeat;}
+    #prize-content { position:absolute; top:0; left:0; width:100%; height:100%;
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      background-color:#fff; color:#1a202c; transition:opacity 1s ease-in-out; z-index:1;}
     @keyframes confetti-fall {
-      0% { transform: translateY(-100%); opacity: 1; }
-      100% { transform: translateY(100vh); opacity: 0; }
+      0%{transform:translateY(-100%);opacity:1;}
+      100%{transform:translateY(100vh);opacity:0;}
     }
-    .confetti {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      opacity: 0;
-      pointer-events: none;
-      border-radius: 50%;
-      background-color: #f6ad55;
-      animation: confetti-fall 5s linear infinite;
-    }
-    .confetti:nth-child(2) { background-color: #fc8181; left: 10%; animation-delay: 0.5s; }
-    .confetti:nth-child(3) { background-color: #9f7aea; left: 25%; animation-delay: 1s; }
-    .confetti:nth-child(4) { background-color: #68d391; left: 40%; animation-delay: 1.5s; }
-    .confetti:nth-child(5) { background-color: #f6ad55; left: 55%; animation-delay: 2s; }
-    .confetti:nth-child(6) { background-color: #fc8181; left: 70%; animation-delay: 2.5s; }
-    .confetti:nth-child(7) { background-color: #9f7aea; left: 85%; animation-delay: 3s; }
-    .confetti.active { opacity: 1; }
+    .confetti { position:absolute; width:8px; height:8px; opacity:0;
+      border-radius:50%; background-color:#f6ad55; animation:confetti-fall 5s linear infinite;}
+    .confetti:nth-child(2){background-color:#fc8181;left:10%;animation-delay:.5s;}
+    .confetti:nth-child(3){background-color:#9f7aea;left:25%;animation-delay:1s;}
+    .confetti:nth-child(4){background-color:#68d391;left:40%;animation-delay:1.5s;}
+    .confetti:nth-child(5){background-color:#f6ad55;left:55%;animation-delay:2s;}
+    .confetti:nth-child(6){background-color:#fc8181;left:70%;animation-delay:2.5s;}
+    .confetti:nth-child(7){background-color:#9f7aea;left:85%;animation-delay:3s;}
+    .confetti.active{opacity:1;}
   </style>
 </head>
 
@@ -92,31 +46,18 @@
 
   <h1 class="text-3xl font-extrabold text-gray-800 mb-6">Scratch and Reveal!</h1>
 
-  <!-- Display total balance -->
   <div class="bg-white shadow-md rounded-xl px-6 py-3 text-center mb-6">
     <p class="text-lg font-semibold text-gray-600">Main Balance:</p>
     <p id="main-balance" class="text-3xl font-bold text-green-600">0 coins</p>
   </div>
 
-  <!-- Confetti -->
-  <div class="relative w-full h-0">
-    <div id="confetti-area" class="w-full max-w-sm mx-auto">
-      <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
-      <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
-    </div>
+  <div id="confetti-area" class="relative w-full h-0">
+    <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+    <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
   </div>
 
-  <!-- Scratch Card -->
   <div id="scratch-card-container">
     <div id="prize-content" class="p-8">
-      <svg class="w-28 h-28 mb-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="24" height="24" fill="#2B6CB0" />
-        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="#3182CE" />
-        <path d="M18.5 4H5.5C4.67 4 4 4.67 4 5.5V6H20V5.5C20 4.67 19.33 4 18.5 4Z" fill="#FEEA73" />
-        <path d="M16 6V11H8V6C8 5.45 8.45 5 9 5H15C15.55 5 16 5.45 16 6ZM18 13C19.1 13 20 12.1 20 11H4C4 12.1 4.9 13 6 13H18ZM19 14H5C3.34 14 2 15.34 2 17V18H22V17C22 15.34 20.66 14 19 14Z" fill="#FEEA73" />
-        <rect x="10" y="18" width="4" height="4" fill="#D69E2E" />
-      </svg>
-
       <p class="text-4xl font-semibold text-gray-700">Congratulations!</p>
       <p id="won-amount" class="text-6xl font-extrabold text-green-600 mt-2">-- coins</p>
       <button id="add-to-balance" class="hidden mt-4 bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition">Add to Main Balance</button>
@@ -132,216 +73,149 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  
-  <script>
-  // Firebase setup
-  const firebaseConfig = {
-    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-    authDomain: "coin-to-real-cash.firebaseapp.com",
-    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-    projectId: "coin-to-real-cash",
-    storageBucket: "coin-to-real-cash.firebasestorage.app",
-    messagingSenderId: "265929655267",
-    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
-  const firestore = firebase.firestore();
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+  authDomain: "coin-to-real-cash.firebaseapp.com",
+  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+  projectId: "coin-to-real-cash",
+  storageBucket: "coin-to-real-cash.firebasestorage.app",
+  messagingSenderId: "265929655267",
+  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const firestore = firebase.firestore();
 
-  // Elements
-  const canvas = document.getElementById('scratch-layer');
-  const ctx = canvas.getContext('2d');
-  const cardContainer = document.getElementById('scratch-card-container');
-  const instruction = document.getElementById('instruction');
-  const mainBalanceEl = document.getElementById('main-balance');
-  const wonAmountEl = document.getElementById('won-amount');
-  const addToBalanceBtn = document.getElementById('add-to-balance');
+const canvas = document.getElementById('scratch-layer');
+const ctx = canvas.getContext('2d');
+const cardContainer = document.getElementById('scratch-card-container');
+const instruction = document.getElementById('instruction');
+const mainBalanceEl = document.getElementById('main-balance');
+const wonAmountEl = document.getElementById('won-amount');
+const addToBalanceBtn = document.getElementById('add-to-balance');
+const remainingEl = document.createElement('p');
+remainingEl.className = "text-lg font-semibold text-blue-600 mt-3";
+instruction.insertAdjacentElement('afterend', remainingEl);
 
-  // Remaining scratch cards display
-  const remainingEl = document.createElement('p');
-  remainingEl.className = "text-lg font-semibold text-blue-600 mt-3";
-  instruction.insertAdjacentElement('afterend', remainingEl);
+let currentUserRef, mainBalance=0, scratchesToday=0, wonCoins=0;
+const DAILY_LIMIT=10, BRUSH_SIZE=30, REVEAL_THRESHOLD=0.55;
+let isScratching=false;
 
-  let currentUserRef;
-  let mainBalance = 0;
-  let scratchesToday = 0;
-  const DAILY_LIMIT = 10;
-  let wonCoins = 0;
-  let isScratching = false;
-  const BRUSH_SIZE = 30;
-  const REVEAL_THRESHOLD = 0.55;
+function startScratch(e){isScratching=true;e.preventDefault();const {x,y}=getScratchCoords(e);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+0.1,y+0.1);ctx.stroke();}
+function scratch(e){if(!isScratching)return;e.preventDefault();const {x,y}=getScratchCoords(e);ctx.lineTo(x,y);ctx.stroke();checkReveal();}
+function endScratch(){isScratching=false;checkReveal();}
+function getScratchCoords(e){const rect=canvas.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return {x:t.clientX-rect.left,y:t.clientY-rect.top};}
+function generateRandomCoins(){return Math.floor(Math.random()*50)+1;}
+function setupScratchCard(){
+  const rect=cardContainer.getBoundingClientRect();
+  canvas.width=rect.width;canvas.height=rect.height;
+  ctx.globalCompositeOperation='source-over';ctx.fillStyle='#2b6cb0';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.globalCompositeOperation='destination-out';
+  ctx.lineWidth=BRUSH_SIZE*2;ctx.lineCap='round';ctx.strokeStyle='rgba(0,0,0,1)';
+  wonCoins=generateRandomCoins();wonAmountEl.textContent=`${wonCoins} coins`;
+  canvas.style.opacity='1';canvas.style.pointerEvents='auto';
+  addToBalanceBtn.classList.add('hidden');
+  document.querySelectorAll('.confetti').forEach(c=>c.classList.remove('active'));
+  canvas.onmousedown=startScratch;canvas.onmousemove=scratch;canvas.onmouseup=endScratch;
+  canvas.ontouchstart=startScratch;canvas.ontouchmove=scratch;canvas.ontouchend=endScratch;
+}
+function checkReveal(){
+  const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const total=img.data.length/4;let cleared=0;
+  for(let i=3;i<img.data.length;i+=4){if(img.data[i]===0)cleared++;}
+  if(cleared/total>=REVEAL_THRESHOLD)revealPrize();
+}
+function revealPrize(){
+  canvas.style.opacity='0';canvas.style.pointerEvents='none';
+  document.querySelectorAll('.confetti').forEach(c=>c.classList.add('active'));
+  addToBalanceBtn.classList.remove('hidden');
+}
+function updateRemainingDisplay(){
+  const r=Math.max(DAILY_LIMIT-scratchesToday,0);
+  remainingEl.textContent=`Remaining scratch cards: ${r}/${DAILY_LIMIT}`;
+}
+function endOfDailyLimit(){
+  instruction.textContent="Your daily limit is over. Come again tomorrow!";
+  remainingEl.textContent=`Remaining scratch cards: 0/${DAILY_LIMIT}`;
+  canvas.style.opacity='0.5';canvas.style.pointerEvents='none';
+  addToBalanceBtn.classList.add('hidden');
+}
 
-  // ---------------- SCRATCH EVENT HANDLERS ----------------
-  function startScratch(e) {
-    isScratching = true;
-    e.preventDefault();
-    const { x, y } = getScratchCoords(e);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + 0.1, y + 0.1);
-    ctx.stroke();
-  }
-
-  function scratch(e) {
-    if (!isScratching) return;
-    e.preventDefault();
-    const { x, y } = getScratchCoords(e);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    checkReveal();
-  }
-
-  function endScratch() {
-    isScratching = false;
-    checkReveal();
-  }
-
-  // ---------------- SCRATCH LOGIC ----------------
-  function getScratchCoords(e) {
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches ? e.touches[0] : e;
-    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-  }
-
-  function generateRandomCoins() {
-    return Math.floor(Math.random() * 50) + 1;
-  }
-
-  function setupScratchCard() {
-    const rect = cardContainer.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = '#2b6cb0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.lineWidth = BRUSH_SIZE * 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(0,0,0,1)';
-
-    wonCoins = generateRandomCoins();
-    wonAmountEl.textContent = `${wonCoins} coins`;
-
-    canvas.style.opacity = '1';
-    canvas.style.pointerEvents = 'auto';
-    addToBalanceBtn.classList.add('hidden');
-    instruction.textContent = "Use your mouse or finger to scratch the card!";
-    document.querySelectorAll('.confetti').forEach(c => c.classList.remove('active'));
-
-    // Add event listeners
-    canvas.addEventListener('mousedown', startScratch);
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('mouseup', endScratch);
-    canvas.addEventListener('mouseleave', endScratch);
-    canvas.addEventListener('touchstart', startScratch);
-    canvas.addEventListener('touchmove', scratch);
-    canvas.addEventListener('touchend', endScratch);
-  }
-
-  function checkReveal() {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const total = imageData.data.length / 4;
-    let cleared = 0;
-    for (let i = 3; i < imageData.data.length; i += 4) {
-      if (imageData.data[i] === 0) cleared++;
-    }
-    if (cleared / total >= REVEAL_THRESHOLD) revealPrize();
-  }
-
-  function revealPrize() {
-    canvas.style.opacity = '0';
-    canvas.style.pointerEvents = 'none';
-    instruction.textContent = "Prize Revealed! 🎉";
-    document.querySelectorAll('.confetti').forEach(c => c.classList.add('active'));
-    addToBalanceBtn.classList.remove('hidden');
-  }
-
-  // ---------------- UPDATE REMAINING ----------------
-  function updateRemainingDisplay() {
-    const remaining = Math.max(DAILY_LIMIT - scratchesToday, 0);
-    remainingEl.textContent = `Remaining scratch cards: ${remaining}/${DAILY_LIMIT}`;
-  }
-
-  function endOfDailyLimit() {
-    instruction.textContent = "Your daily limit is over. Come again tomorrow to get more coins!";
-    remainingEl.textContent = `Remaining scratch cards: 0/${DAILY_LIMIT}`;
-    canvas.style.opacity = '0.5';
-    canvas.style.pointerEvents = 'none';
-    addToBalanceBtn.classList.add('hidden');
-  }
-
-  // ---------------- FIREBASE AUTH ----------------
-  auth.onAuthStateChanged(user => {
-    if (!user) { window.location.href = "login.html"; return; }
-    currentUserRef = db.ref("users/" + user.uid);
-
-    currentUserRef.on("value", snapshot => {
-      const data = snapshot.val();
-      mainBalance = (data && data.coins) || 0;
-      mainBalanceEl.textContent = `${mainBalance} coins`;
-
-      const today = new Date().toDateString();
-      const lastScratchDate = data && data.lastScratchDate;
-      scratchesToday = (data && data.scratchesToday) || 0;
-
-      // Reset for new day
-      if (lastScratchDate !== today) {
-        scratchesToday = 0;
-        currentUserRef.update({ scratchesToday: 0, lastScratchDate: today });
-      }
-
-      updateRemainingDisplay();
-
-      if (scratchesToday >= DAILY_LIMIT) {
-        endOfDailyLimit();
-      } else {
-        setupScratchCard();
-      }
-    });
+// -------- Firebase --------
+auth.onAuthStateChanged(user=>{
+  if(!user){window.location.href="login.html";return;}
+  currentUserRef=db.ref("users/"+user.uid);
+  currentUserRef.on("value",snap=>{
+    const data=snap.val()||{};
+    mainBalance=data.coins||0;
+    mainBalanceEl.textContent=`${mainBalance} coins`;
+    const today=new Date().toDateString();
+    if(data.lastScratchDate!==today){scratchesToday=0;currentUserRef.update({scratchesToday:0,lastScratchDate:today});}
+    else scratchesToday=data.scratchesToday||0;
+    updateRemainingDisplay();
+    scratchesToday>=DAILY_LIMIT?endOfDailyLimit():setupScratchCard();
   });
+});
 
-  // ---------------- ADD TO BALANCE ----------------
-  addToBalanceBtn.addEventListener('click', () => {
-    addToBalanceBtn.textContent = "Adding...";
-    addToBalanceBtn.disabled = true;
+// -------- Ad logic + Reward --------
+function showAdBeforeReward(){
+  const adOverlay=document.createElement("div");
+  adOverlay.style.cssText=`position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.85);display:flex;flex-direction:column;justify-content:center;
+  align-items:center;z-index:9999;color:#fff;`;
+  adOverlay.innerHTML=`
+    <div style="background:#fff;border-radius:14px;padding:25px;text-align:center;
+    width:85%;max-width:420px;box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#000;">
+      <h2 style="color:#0288d1;font-weight:600;margin-bottom:10px;">Ad is Playing...</h2>
+      <p id='countdownText' style="font-size:16px;">Please wait 30 seconds...</p>
+      <div id="adContainer" style="margin:12px 0;height:250px;"></div>
+      <button id='skipBtn' style="margin-top:18px;background:#0288d1;color:#fff;border:none;
+      border-radius:8px;padding:10px 22px;cursor:pointer;font-size:15px;font-weight:500;
+      display:none;transition:all 0.3s ease;">Skip Ad</button>
+    </div>`;
+  document.body.appendChild(adOverlay);
 
-    currentUserRef.get().then(snapshot => {
-      const data = snapshot.val();
-      const coins = (data && data.coins) || 0;
-      const todaysEarnings = (data && data.todaysEarnings) || 0;
-      const newBalance = coins + wonCoins;
-      const today = new Date().toDateString();
-      const newScratchesToday = scratchesToday + 1;
+  const s1=document.createElement("script");
+  s1.innerHTML=`atOptions={'key':'881f54a3710d190b5f6727ff89c6cd51','format':'iframe','height':250,'width':300,'params':{}};`;
+  const s2=document.createElement("script");
+  s2.src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js";
+  adOverlay.querySelector("#adContainer").appendChild(s1);
+  adOverlay.querySelector("#adContainer").appendChild(s2);
 
-      currentUserRef.update({
-        coins: newBalance,
-        todaysEarnings: todaysEarnings + wonCoins,
-        scratchesToday: newScratchesToday,
-        lastScratchDate: today
-      });
+  let countdown=30;
+  const txt=adOverlay.querySelector("#countdownText");
+  const skipBtn=adOverlay.querySelector("#skipBtn");
+  setTimeout(()=>{skipBtn.style.display="inline-block";},25000);
+  const timer=setInterval(()=>{
+    countdown--;txt.textContent=`Please wait ${countdown} seconds...`;
+    if(countdown<=0){clearInterval(timer);closeAd();}
+  },1000);
+  skipBtn.onclick=()=>{clearInterval(timer);closeAd();}
+  function closeAd(){adOverlay.remove();addCoinsAfterAd();}
+}
 
-      firestore.collection("users").doc(auth.currentUser.uid).set({
-        coins: newBalance,
-        lastScratch: new Date().toISOString()
-      }, { merge: true });
-
-      mainBalanceEl.textContent = `${newBalance} coins`;
-      scratchesToday = newScratchesToday;
-      updateRemainingDisplay();
-
-      if (scratchesToday >= DAILY_LIMIT) {
-        endOfDailyLimit();
-      } else {
-        setTimeout(() => {
-          addToBalanceBtn.textContent = "Add to Main Balance";
-          addToBalanceBtn.disabled = false;
-          setupScratchCard();
-        }, 500);
-      }
-    });
+function addCoinsAfterAd(){
+  currentUserRef.get().then(snap=>{
+    const data=snap.val()||{};
+    const coins=data.coins||0,todays=data.todaysEarnings||0;
+    const newBal=coins+wonCoins;
+    const today=new Date().toDateString();
+    const newScratch=scratchesToday+1;
+    currentUserRef.update({coins:newBal,todaysEarnings:todays+wonCoins,scratchesToday:newScratch,lastScratchDate:today});
+    firestore.collection("users").doc(auth.currentUser.uid).set({coins:newBal,lastScratch:new Date().toISOString()},{merge:true});
+    mainBalanceEl.textContent=`${newBal} coins`;scratchesToday=newScratch;updateRemainingDisplay();
+    scratchesToday>=DAILY_LIMIT?endOfDailyLimit():setupScratchCard();
   });
+}
+
+// -------- Add to balance click --------
+addToBalanceBtn.addEventListener('click',()=>{
+  addToBalanceBtn.disabled=true;
+  showAdBeforeReward();
+});
 </script>
 </body>
 </html>
