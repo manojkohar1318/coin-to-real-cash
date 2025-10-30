@@ -6,42 +6,36 @@
 <title>Daily Bonus</title>
 <link rel="stylesheet" href="assets/css/dailybonus.css">
 <style>
-/* --- Overlay Ad Style --- */
+/* Overlay for ad simulation */
 #adOverlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  color: #fff;
-  z-index: 9999;
-}
-#adContainer {
-  background: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  width: 320px;
-  height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    display: none;
 }
 #skipAdBtn {
-  margin-top: 15px;
-  background: #1e90ff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  display: none;
+    display: none;
+    margin-top: 20px;
+    background: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
 }
-#skipAdBtn:hover { background: #0074e0; }
-#timerText { margin-top: 10px; font-size: 1rem; }
+#adTimer {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #ffd700;
+}
 </style>
 </head>
 <body>
@@ -64,23 +58,24 @@
     </div>
 </div>
 
-<!-- 30-second Ad Overlay -->
+<!-- Ad simulation overlay -->
 <div id="adOverlay">
-  <div id="adContainer">
-    <!-- Adsterra iframe -->
-    <script type="text/javascript">
-      atOptions = {
-        'key' : '881f54a3710d190b5f6727ff89c6cd51',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-    </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
-  </div>
-  <p id="timerText">Ad ends in <span id="adTimer">30</span>s</p>
-  <button id="skipAdBtn">Skip Ad</button>
+    <h2>📺 Ad is playing...</h2>
+    <p id="adTimer">30 seconds remaining</p>
+    <button id="skipAdBtn">Skip Ad</button>
+    <!-- Adsterra ad code inside overlay -->
+    <div id="adContainer" style="margin-top:20px;">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '881f54a3710d190b5f6727ff89c6cd51',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
+    </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -89,13 +84,13 @@
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
-  authDomain: "coin-to-real-cash.firebaseapp.com",
-  databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
-  projectId: "coin-to-real-cash",
-  storageBucket: "coin-to-real-cash.firebasestorage.app",
-  messagingSenderId: "265929655267",
-  appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
+    apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
+    authDomain: "coin-to-real-cash.firebaseapp.com",
+    databaseURL: "https://coin-to-real-cash-default-rtdb.firebaseio.com",
+    projectId: "coin-to-real-cash",
+    storageBucket: "coin-to-real-cash.firebasestorage.app",
+    messagingSenderId: "265929655267",
+    appId: "1:265929655267:web:7eb846fe7bd104761a56d6"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -109,109 +104,122 @@ const overlay = document.querySelector('.overlay');
 const winMessage = document.getElementById('winMessage');
 const rewardText = document.getElementById('reward-text');
 const addBalanceBtn = document.getElementById('addBalanceBtn');
-
 const adOverlay = document.getElementById('adOverlay');
-const adTimerEl = document.getElementById('adTimer');
 const skipAdBtn = document.getElementById('skipAdBtn');
-const timerText = document.getElementById('timerText');
+const adTimer = document.getElementById('adTimer');
 
-const dailyInterval = 24 * 60 * 60 * 1000;
-const dailyReward = 50;
-let currentUserRef, mainBalance = 0;
+const dailyInterval = 24 * 60 * 60 * 1000; 
+const dailyReward = 50; 
+
+let currentUserRef;
+let mainBalance = 0;
 
 auth.onAuthStateChanged(user => {
-  if (!user) { window.location.href = "login.html"; return; }
-  currentUserRef = db.ref("users/" + user.uid);
-  currentUserRef.on("value", snapshot => {
-    const data = snapshot.val();
-    mainBalance = (data && data.coins) || 0;
-    mainBalanceElement.textContent = mainBalance;
-  });
-  updateUI();
+    if(!user){ window.location.href = "login.html"; return; }
+    currentUserRef = db.ref("users/" + user.uid);
+
+    // Fetch and display balance
+    currentUserRef.on("value", snapshot => {
+        const data = snapshot.val();
+        mainBalance = (data && data.coins) || 0;
+        mainBalanceElement.textContent = mainBalance;
+    });
+
+    updateUI();
 });
 
 function updateUI() {
-  currentUserRef.get().then(snapshot => {
-    const data = snapshot.val();
-    const lastClaimTime = (data && data.lastClaimTime) || 0;
-    const now = Date.now();
-    if (now - lastClaimTime < dailyInterval) {
-      claimButton.disabled = true;
-      const timeRemaining = dailyInterval - (now - lastClaimTime);
-      startCountdown(timeRemaining);
-      bonusMessage.textContent = "You've already claimed your bonus today!";
-    } else {
-      claimButton.disabled = false;
-      bonusMessage.textContent = "Claim your reward!";
-      countdownElement.textContent = "";
-    }
-  });
+    currentUserRef.get().then(snapshot => {
+        const data = snapshot.val();
+        const lastClaimTime = (data && data.lastClaimTime) || 0;
+        const now = new Date().getTime();
+
+        if (now - lastClaimTime < dailyInterval) {
+            claimButton.disabled = true;
+            const timeRemaining = dailyInterval - (now - lastClaimTime);
+            startCountdown(timeRemaining);
+            bonusMessage.textContent = "You've already claimed your bonus today!";
+        } else {
+            claimButton.disabled = false;
+            bonusMessage.textContent = "Claim your reward!";
+            countdownElement.textContent = "";
+        }
+    });
 }
 
 function startCountdown(time) {
-  let remaining = time;
-  const interval = setInterval(() => {
-    remaining -= 1000;
-    if (remaining <= 0) { clearInterval(interval); updateUI(); }
-    else {
-      const h = Math.floor(remaining / 3600000);
-      const m = Math.floor((remaining % 3600000) / 60000);
-      const s = Math.floor((remaining % 60000) / 1000);
-      countdownElement.textContent = `Next bonus in: ${h}h ${m}m ${s}s`;
-    }
-  }, 1000);
+    let remaining = time;
+    const interval = setInterval(() => {
+        remaining -= 1000;
+        if (remaining <= 0) { clearInterval(interval); updateUI(); } 
+        else {
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            countdownElement.textContent = `Next bonus in: ${hours}h ${minutes}m ${seconds}s`;
+        }
+    }, 1000);
 }
 
 claimButton.addEventListener('click', () => {
-  claimButton.disabled = true;
-  const now = Date.now();
-  rewardText.textContent = `You have got ${dailyReward} coins!`;
-  overlay.style.display = 'block';
-  winMessage.style.display = 'block';
-  currentUserRef.update({ lastClaimTime: now });
+    claimButton.disabled = true;
+    const now = new Date().getTime();
+    
+    rewardText.textContent = `You have got ${dailyReward} coins!`;
+    overlay.style.display = 'block';
+    winMessage.style.display = 'block';
+    currentUserRef.update({lastClaimTime: now});
 });
 
-// ---------------- AD + REWARD FLOW ----------------
+// Ad simulation logic before adding balance
 addBalanceBtn.addEventListener('click', () => {
-  overlay.style.display = 'none';
-  winMessage.style.display = 'none';
+    winMessage.style.display = 'none';
+    overlay.style.display = 'none';
+    playAd().then(() => {
+        currentUserRef.get().then(snapshot => {
+            const data = snapshot.val();
+            const coins = (data && data.coins) || 0;
+            const todaysEarnings = (data && data.todaysEarnings) || 0;
 
-  let seconds = 30;
-  adTimerEl.textContent = seconds;
-  skipAdBtn.style.display = 'none';
-  adOverlay.style.display = 'flex';
-
-  const adInterval = setInterval(() => {
-    seconds--;
-    adTimerEl.textContent = seconds;
-    if (seconds <= 5) timerText.style.color = "#ffeb3b";
-    if (seconds <= 25 && !skipAdBtn.style.display) skipAdBtn.style.display = 'block';
-    if (seconds <= 0) {
-      clearInterval(adInterval);
-      finishAd();
-    }
-  }, 1000);
-
-  skipAdBtn.onclick = () => {
-    clearInterval(adInterval);
-    finishAd();
-  };
-
-  function finishAd() {
-    adOverlay.style.display = 'none';
-    addReward();
-  }
+            currentUserRef.update({
+                coins: coins + dailyReward,
+                todaysEarnings: todaysEarnings + dailyReward
+            }).then(() => {
+                claimButton.disabled = true;
+                updateUI();
+            });
+        });
+    });
 });
 
-function addReward() {
-  currentUserRef.get().then(snapshot => {
-    const data = snapshot.val() || {};
-    const newCoins = (data.coins || 0) + dailyReward;
-    const newToday = (data.todaysEarnings || 0) + dailyReward;
-    currentUserRef.update({ coins: newCoins, todaysEarnings: newToday });
-    mainBalanceElement.textContent = newCoins;
-    updateUI();
-  });
+function playAd() {
+    return new Promise(resolve => {
+        let timeLeft = 30;
+        adOverlay.style.display = 'flex';
+        skipAdBtn.style.display = 'none';
+        adTimer.textContent = `${timeLeft} seconds remaining`;
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            adTimer.textContent = `${timeLeft} seconds remaining`;
+
+            if (timeLeft === 5) skipAdBtn.style.display = 'block'; // show skip after 25s (30-5)
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                closeAd();
+            }
+        }, 1000);
+
+        skipAdBtn.onclick = () => {
+            clearInterval(timerInterval);
+            closeAd();
+        };
+
+        function closeAd() {
+            adOverlay.style.display = 'none';
+            resolve();
+        }
+    });
 }
 </script>
 </body>
