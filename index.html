@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="assets/css/index.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-	<meta name='admaven-placement' content=Bqja5qTY8>
+  <meta name='admaven-placement' content=Bqja5qTY8>
 </head>
 <body>
   <div class="header-banner">
@@ -52,6 +52,7 @@
     </p>
   </div>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -73,10 +74,7 @@
     const db = firebase.database();
     const firestore = firebase.firestore();
 
-    // 🚫 Removed auto-redirect for logged-in users
-    // We only handle login manually below.
-
-    // 🔐 Login form
+    // 🔐 Email/Password Login
     document.getElementById("login-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("login-email").value.trim();
@@ -84,7 +82,6 @@
 
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
-          // ✅ Admin check
           if (email === "cointorealcash@gmail.com" && password === "Manoj@1318%#") {
             alert("Admin login successful!");
             window.location.href = "admin-withdrawals.html";
@@ -110,53 +107,72 @@
       }
     }
 
-    // 🌐 Google Sign-In
+    // 🌐 Google Sign-In (Fixed for Web + PWA/App)
     const googleSignInBtn = document.getElementById("googleSignInBtn");
     const provider = new firebase.auth.GoogleAuthProvider();
 
+    // Detect if inside PWA or WebView
+    const isInApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
     googleSignInBtn.addEventListener("click", async () => {
       try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-
-        const userData = {
-          uid: user.uid,
-          name: user.displayName || "",
-          email: user.email,
-          profilePic: user.photoURL || "",
-          createdAt: new Date().toISOString(),
-          coins: 0,
-          authProvider: "google",
-        };
-
-        // Save to Realtime DB + Firestore
-        db.ref("users/" + user.uid).update(userData);
-        firestore.collection("users").doc(user.uid).set(userData, { merge: true });
-
-        // 🔐 Redirect admin if Google sign-in email matches admin
-        if (user.email === "cointorealcash@gmail.com") {
-          alert("Admin login successful!");
-          window.location.href = "admin-withdrawals.html";
+        if (isInApp) {
+          // Use redirect method for PWAs / mobile app
+          await auth.signInWithRedirect(provider);
         } else {
-          alert("Google Sign-In successful!");
-          window.location.href = "home.html";
+          // Use popup for normal browsers
+          await auth.signInWithPopup(provider);
         }
-
       } catch (error) {
         console.error("Google Sign-In Error:", error);
         alert("Google Sign-In failed: " + error.message);
       }
     });
+
+    // Handle redirect result (after returning from Google)
+    auth.getRedirectResult()
+      .then((result) => {
+        if (result.user) {
+          const user = result.user;
+          const userData = {
+            uid: user.uid,
+            name: user.displayName || "",
+            email: user.email,
+            profilePic: user.photoURL || "",
+            createdAt: new Date().toISOString(),
+            coins: 0,
+            authProvider: "google",
+          };
+
+          db.ref("users/" + user.uid).update(userData);
+          firestore.collection("users").doc(user.uid).set(userData, { merge: true });
+
+          if (user.email === "cointorealcash@gmail.com") {
+            alert("Admin login successful!");
+            window.location.href = "admin-withdrawals.html";
+          } else {
+            alert("Google Sign-In successful!");
+            window.location.href = "home.html";
+          }
+        }
+      })
+      .catch((error) => {
+        if (error && error.code !== "auth/no-auth-event") {
+          console.error("Redirect Sign-In Error:", error);
+        }
+      });
   </script>
-<script type="text/javascript">
-	atOptions = {
-		'key' : '881f54a3710d190b5f6727ff89c6cd51',
-		'format' : 'iframe',
-		'height' : 250,
-		'width' : 300,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
+
+  <!-- Ad Script -->
+  <script type="text/javascript">
+    atOptions = {
+      'key': '881f54a3710d190b5f6727ff89c6cd51',
+      'format': 'iframe',
+      'height': 250,
+      'width': 300,
+      'params': {}
+    };
+  </script>
+  <script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
 </body>
 </html>
