@@ -24,6 +24,7 @@
     Balance: <span id="currentBalance">0</span>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -64,7 +65,7 @@ auth.onAuthStateChanged(user => {
     }
     const userRef = db.ref("users/" + user.uid);
 
-    // Live balance update
+    // live balance update
     userRef.on("value", snapshot => {
         const data = snapshot.val();
         if(data) balanceDisplay.textContent = data.coins;
@@ -106,9 +107,8 @@ auth.onAuthStateChanged(user => {
     });
 });
 
-// 🟢 Function to show Adsterra video-like popup
+// ✅ Function to show 30-sec Ad overlay before adding reward
 function showAdBeforeReward(userRef){
-    // Create ad overlay
     const adOverlay = document.createElement("div");
     adOverlay.style.position = "fixed";
     adOverlay.style.top = "0";
@@ -120,28 +120,44 @@ function showAdBeforeReward(userRef){
     adOverlay.style.alignItems = "center";
     adOverlay.style.justifyContent = "center";
     adOverlay.style.zIndex = "9999";
-    adOverlay.innerHTML = `
-        <div style="background:#fff; padding:15px; border-radius:10px; text-align:center; max-width:320px;">
-            <h3>Watch this short ad to earn your coins</h3>
-            <div id="adContainer" style="margin:10px 0;">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '881f54a3710d190b5f6727ff89c6cd51',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
-            </div>
-            <p id="countdownText" style="font-weight:bold; color:#1e90ff;">Please wait 30 seconds...</p>
-        </div>
+
+    const adBox = document.createElement("div");
+    adBox.style.background = "#fff";
+    adBox.style.padding = "15px";
+    adBox.style.borderRadius = "10px";
+    adBox.style.textAlign = "center";
+    adBox.style.maxWidth = "320px";
+
+    adBox.innerHTML = `
+        <h3>Watch this short ad to earn your coins</h3>
+        <div id="adContainer" style="margin:10px 0;"></div>
+        <p id="countdownText" style="font-weight:bold; color:#1e90ff;">Please wait 30 seconds...</p>
     `;
+
+    adOverlay.appendChild(adBox);
     document.body.appendChild(adOverlay);
 
+    // ✅ Add Adsterra scripts dynamically
+    const adScript1 = document.createElement("script");
+    adScript1.innerHTML = `
+        atOptions = {
+            'key' : '881f54a3710d190b5f6727ff89c6cd51',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+        };
+    `;
+    const adScript2 = document.createElement("script");
+    adScript2.src = "//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js";
+
+    const adContainer = adBox.querySelector("#adContainer");
+    adContainer.appendChild(adScript1);
+    adContainer.appendChild(adScript2);
+
+    // Countdown timer (30 sec)
     let countdown = 30;
-    const countdownText = adOverlay.querySelector("#countdownText");
+    const countdownText = adBox.querySelector("#countdownText");
     const timer = setInterval(()=>{
         countdown--;
         countdownText.textContent = `Please wait ${countdown} seconds...`;
@@ -156,11 +172,13 @@ function showAdBeforeReward(userRef){
     }, 1000);
 }
 
+// ✅ Function to reward user after ad
 function rewardUser(userRef){
     userRef.get().then(snapshot=>{
         const data = snapshot.val();
         const newCoins = (data.coins||0)+currentPrize;
         const newTodays = (data.todaysEarnings||0)+currentPrize;
+
         userRef.update({coins:newCoins, todaysEarnings:newTodays}).then(()=>{
             overlay.style.display='none';
             message.style.display='none';
@@ -170,16 +188,5 @@ function rewardUser(userRef){
     });
 }
 </script>
-
-    <script type="text/javascript">
-	atOptions = {
-		'key' : '881f54a3710d190b5f6727ff89c6cd51',
-		'format' : 'iframe',
-		'height' : 250,
-		'width' : 300,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/881f54a3710d190b5f6727ff89c6cd51/invoke.js"></script>
 </body>
 </html>
