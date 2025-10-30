@@ -107,29 +107,40 @@
       }
     }
 
-    // 🌐 Google Sign-In (Fixed for Web + PWA/App)
+    // 🌐 Google Sign-In (Popup/Redirect hybrid)
     const googleSignInBtn = document.getElementById("googleSignInBtn");
     const provider = new firebase.auth.GoogleAuthProvider();
+    let isSigningIn = false; // prevent multiple clicks
 
-    // Detect if inside PWA or WebView
-    const isInApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    // Detect PWA or WebView
+    const isInApp =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone ||
+      document.referrer.includes("android-app://");
 
     googleSignInBtn.addEventListener("click", async () => {
+      if (isSigningIn) return;
+      isSigningIn = true;
+      googleSignInBtn.disabled = true;
+
       try {
         if (isInApp) {
-          // Use redirect method for PWAs / mobile app
           await auth.signInWithRedirect(provider);
         } else {
-          // Use popup for normal browsers
           await auth.signInWithPopup(provider);
         }
       } catch (error) {
-        console.error("Google Sign-In Error:", error);
-        alert("Google Sign-In failed: " + error.message);
+        if (error.code !== "auth/cancelled-popup-request") {
+          alert("Google Sign-In failed: " + error.message);
+          console.error("Google Sign-In Error:", error);
+        }
+      } finally {
+        googleSignInBtn.disabled = false;
+        isSigningIn = false;
       }
     });
 
-    // Handle redirect result (after returning from Google)
+    // Handle Redirect Result
     auth.getRedirectResult()
       .then((result) => {
         if (result.user) {
