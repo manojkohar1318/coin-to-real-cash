@@ -148,6 +148,7 @@ body {
     border: 1px dashed #ced4da;
     border-radius: 25px;
     padding: 10px 15px;
+    text-decoration: none;
     display: flex;
     align-items: center;
     gap: 5px;
