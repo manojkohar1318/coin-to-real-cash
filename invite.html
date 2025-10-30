@@ -9,8 +9,52 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="container invite-page-container">
+<h2 class="invite-main-title" style="font-size: 25px;">Invite Friend and Get Bonus Instantly</h2>
+<p class="invite-subtitle" style="font-size: 15px;">You will get 500 coins and your friend get 250 coins instantly</p>
 
-<script>
+<div class="illustration-placeholder">
+    <img src="assets/image/invite-friend-illustration-svg-download-png-9394077.webp" alt="Refer A Friend Illustration">
+</div>
+
+<div class="referral-code-section">
+    <div class="input-group referral-code-box">
+        <i class="fas fa-copy"></i>
+        <input type="text" value="" readonly class="referral-code-input">
+        <button class="share-button">Share</button>
+    </div>
+</div>
+
+<p class="have-referral-code"><a href="referral-code.html">Have a Referral Code?</a></p>
+
+<div class="social-media-invite">
+    <p>Invite by Social Media</p>
+    <div class="social-icons">
+        <a class="social-icon whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+    <a href="invite.html" class="nav-item active">
+        <i class="fas fa-user-plus"></i>
+        <span>Invite</span>
+    </a>
+    <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile</span>
+    </a>
+</div>
+  <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAkWyk3q-zaDHkjDs90Bm2ih_qw-O_ZJQU",
   authDomain: "coin-to-real-cash.firebaseapp.com",
@@ -115,50 +159,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-</head>
-<body>
-<div class="container invite-page-container">
-<h2 class="invite-main-title" style="font-size: 25px;">Invite Friend and Get Bonus Instantly</h2>
-<p class="invite-subtitle" style="font-size: 15px;">You will get 500 coins and your friend get 250 coins instantly</p>
-
-<div class="illustration-placeholder">
-    <img src="assets/image/invite-friend-illustration-svg-download-png-9394077.webp" alt="Refer A Friend Illustration">
-</div>
-
-<div class="referral-code-section">
-    <div class="input-group referral-code-box">
-        <i class="fas fa-copy"></i>
-        <input type="text" value="" readonly class="referral-code-input">
-        <button class="share-button">Share</button>
-    </div>
-</div>
-
-<p class="have-referral-code"><a href="referral-code.html">Have a Referral Code?</a></p>
-
-<div class="social-media-invite">
-    <p>Invite by Social Media</p>
-    <div class="social-icons">
-        <a class="social-icon whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <a href="home.html" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-    </a>
-    <a href="invite.html" class="nav-item active">
-        <i class="fas fa-user-plus"></i>
-        <span>Invite</span>
-    </a>
-    <a href="wallet.html" class="nav-item">
-        <i class="fas fa-wallet"></i>
-        <span>Wallet</span>
-    </a>
-    <a href="profile.html" class="nav-item">
-        <i class="fas fa-user-circle"></i>
-        <span>Profile</span>
-    </a>
-</div>
 </body>
 </html>
