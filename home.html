@@ -160,7 +160,7 @@ document.getElementById("referNowBtn").addEventListener("click", async () => {
   const userData = snapshot.val();
   const referralCode = userData?.referralCode || user.uid.substring(0, 6).toUpperCase();
 
-  const shareText = `🎉 Use my referral code *${referralCode}* on Coin To Real Cash and earn 250 coins instantly! 💰\n\nDownload now: https://appsgeyser.io/19225891/Coin To Real Cash/`;
+  const shareText = `🎉 Use my referral code *${referralCode}* on Coin To Real Cash and earn 250 coins instantly! 💰\n\nDownload now: https://appsgeyser.io/19225891/Coin-To-Real-Cash`;
 
   if (navigator.share) {
     await navigator.share({ title: "Coin To Real Cash", text: shareText });
