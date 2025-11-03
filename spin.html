@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spin Wheel</title>
 <link rel="stylesheet" href="assets/css/spin.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3213109580536726"
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3213109580536726"
      crossorigin="anonymous"></script>
 </head>
 <body>
@@ -61,6 +61,7 @@ wheel.innerHTML = values.map((val, i) => `
 let deg = 0;
 let currentPrize = 0;
 
+// ========== FIREBASE AUTH =============
 auth.onAuthStateChanged(user => {
   if (!user) {
     window.location.href = "login.html";
@@ -74,6 +75,7 @@ auth.onAuthStateChanged(user => {
     if (data) balanceDisplay.textContent = data.coins;
   });
 
+  // Spin button click
   spinBtn2.addEventListener("click", e => {
     e.preventDefault();
     spinBtn2.style.pointerEvents = 'none';
@@ -110,7 +112,7 @@ auth.onAuthStateChanged(user => {
   });
 });
 
-// Reward function
+// ========== REWARD FUNCTION ==========
 function rewardUser(userRef, currentPrize) {
   userRef.get().then(snapshot => {
     const data = snapshot.val();
@@ -121,10 +123,75 @@ function rewardUser(userRef, currentPrize) {
       document.querySelector('.overlay').style.display = 'none';
       document.getElementById('winMessage').style.display = 'none';
       document.querySelector('.spinBtn-2').style.pointerEvents = 'auto';
+      alert(`✅ ${currentPrize} coins added to your main balance!`);
     });
   });
 }
 </script>
+
+<!-- =================== ADMOB REWARDED VIDEO SCRIPT =================== -->
+<script type="text/javascript">
+document.addEventListener('deviceready', async function () {
+  console.log("Device is ready — initializing AdMob...");
+  
+  try {
+    await admob.start();
+
+    // Create and preload Rewarded Ad
+    window.rewardedAd = new admob.RewardedAd({
+      adUnitId: 'ca-app-pub-3213109580536726/5751573055' // real id
+    });
+    await window.rewardedAd.load();
+    console.log("Rewarded ad preloaded successfully!");
+  } catch (err) {
+    console.error("AdMob init error:", err);
+  }
+});
+
+// Show Ad when Add button clicked
+async function showAdOverlay(userRef, currentPrize) {
+  if (!window.rewardedAd) {
+    alert("Ad is still loading. Please wait a moment.");
+    return;
+  }
+
+  try {
+    await window.rewardedAd.show();
+    console.log("Ad shown successfully");
+
+    // If ad finishes and reward is earned
+    window.rewardedAd.on('rewarded', () => {
+      console.log('Ad reward event triggered!');
+      rewardUser(userRef, currentPrize);
+    });
+
+    // If user closes early, wait 25 seconds before reward
+    window.rewardedAd.on('dismissed', () => {
+      console.log('Ad closed early. Delaying reward...');
+      setTimeout(() => {
+        rewardUser(userRef, currentPrize);
+      }, 25000);
+    });
+
+    // Reload a new ad after showing
+    window.rewardedAd.on('dismissed', async () => {
+      try {
+        await window.rewardedAd.load();
+        console.log("Ad reloaded for next time");
+      } catch (err) {
+        console.log("Failed to reload ad:", err);
+      }
+    });
+
+  } catch (err) {
+    console.log("Ad failed to show:", err);
+    // Fallback: still reward if ad fails
+    rewardUser(userRef, currentPrize);
+  }
+}
+</script>
+
 </body>
 </html>
+
 
